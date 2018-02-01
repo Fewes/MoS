@@ -1,10 +1,10 @@
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/Assets/AssetStoreTools*
-/_build
+/MoS_Cloth/[Ll]ibrary/
+/MoS_Cloth/[Tt]emp/
+/MoS_Cloth/[Oo]bj/
+/MoS_Cloth/[Bb]uild/
+/MoS_Cloth/[Bb]uilds/
+/MoS_Cloth/Assets/AssetStoreTools*
+/MoS_Cloth/_build
 
 # Visual Studio 2015 cache directory
 /.vs/
