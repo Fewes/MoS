@@ -6,9 +6,9 @@ p4 = [ 3 0  0.04 ];
 
 m = 0.05;
 
-k = 10;
+k = 100;
 
-dampening = 5;
+dampening = 2;
 
 sd1_2 = dist(p1, p2);
 sd2_3 = dist(p2, p3);
