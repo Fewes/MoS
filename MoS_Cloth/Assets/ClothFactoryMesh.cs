@@ -2,94 +2,116 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * TODO: Unity duplicates vertices for UV borders, which means meshes become segmented.
+ *       - Detect which points are duplicates and create a new vertex list before generating the rest
+ *       - Remember to update the triangle IDs to not point at invalid indices
+ */
+
 public class ClothFactoryMesh : ClothFactory
 {
 	[SerializeField]
 	Mesh		mesh;
+    public bool PinFirstAndLastPoint = true;
+
+    public class Edge
+    {
+        public int VertexA;
+        public int VertexB;
+
+        public Edge(int vertexa, int vertexb)
+        {
+            VertexA = vertexa;
+            VertexB = vertexb;
+        }
+
+        public bool SameAs(Edge other)
+        {
+            // (1,0) == (1,0) || (1,0) == (0,1)
+            return (other.VertexA == this.VertexA && other.VertexB == this.VertexB) ||
+                   (other.VertexA == this.VertexB && other.VertexB == this.VertexA);
+        }
+
+        public string DebugString()
+        {
+            return "(" + this.VertexA + ", " + this.VertexB + " )";
+        }
+    }
+
+    public void RemoveDuplicateEdges(List<ClothFactoryMesh.Edge> edges)
+    {
+        // Brute force. This is done without swapping or other list optimizations...
+        int lastIndex = edges.Count - 1;
+        for (int i = 0; i <= lastIndex; i++)
+        {
+            // Iterate from the back of the list and remove elements as we find duplicates
+            for (int j = lastIndex; j > i; j--)
+            {
+                if (edges[i].SameAs(edges[j]))
+                {
+                    edges.RemoveAt(j);
+                    lastIndex--;
+                }
+            }
+        }
+    }
+
+    public bool TrianglesToEdges(int[] triangles, List<ClothFactoryMesh.Edge> edges)
+    {
+        edges.Clear();
+
+        // Generate edges for all triangles
+        int offset;
+        int numTriangles = triangles.Length / 3;
+        for (int i=0; i<numTriangles; i++)
+        {
+            offset = i * 3;
+            edges.Add(new Edge(triangles[offset + 0], triangles[offset + 1]));
+            edges.Add(new Edge(triangles[offset + 1], triangles[offset + 2]));
+            edges.Add(new Edge(triangles[offset + 2], triangles[offset + 0]));
+        }
+
+        RemoveDuplicateEdges(edges);
+
+        return (edges.Count > 0);
+    }
 
 	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links)
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
 
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.00f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.33f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.66f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 1.00f));
+        if (mesh && mesh.vertexCount > 0)
+        {
+            Vector3[] vertices = mesh.vertices;
+            int[] triangles = mesh.triangles;
 
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.00f + Vector3.right * 0.33f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.33f + Vector3.right * 0.33f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.66f + Vector3.right * 0.33f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 1.00f + Vector3.right * 0.33f));
+            int i = 0;
+            while (i < vertices.Length)
+            {
+                points.Add(new VeryLett.ClothPoint(transform.position + vertices[i]));
+                i++;
+            }
 
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.00f + Vector3.right * 0.66f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.33f + Vector3.right * 0.66f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.66f + Vector3.right * 0.66f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 1.00f + Vector3.right * 0.66f));
+            if (PinFirstAndLastPoint)
+            {
+                points[0].fixd = true;
+                points[points.Count-1].fixd = true;
+            }
 
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.00f + Vector3.right * 0.99f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.33f + Vector3.right * 0.99f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.66f + Vector3.right * 0.99f));
-		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 1.00f + Vector3.right * 0.99f));
+            List<ClothFactoryMesh.Edge> edges = new List<ClothFactoryMesh.Edge>();
+            if (TrianglesToEdges(triangles, edges))
+            {
+                foreach (var edge in edges)
+                {
+                    links.Add(new VeryLett.ClothLink(points[edge.VertexA], points[edge.VertexB]));
+                }
+            }
 
-		points[0].fixd = true;
-		//points[4].fixd = true;
-		//points[8].fixd = true;
-		points[12].fixd = true;
-
-		// Vertical links
-		links.Add(new VeryLett.ClothLink(points[0], points[1]));
-		links.Add(new VeryLett.ClothLink(points[1], points[2]));
-		links.Add(new VeryLett.ClothLink(points[2], points[3]));
-
-		links.Add(new VeryLett.ClothLink(points[4], points[5]));
-		links.Add(new VeryLett.ClothLink(points[5], points[6]));
-		links.Add(new VeryLett.ClothLink(points[6], points[7]));
-
-		links.Add(new VeryLett.ClothLink(points[8], points[9]));
-		links.Add(new VeryLett.ClothLink(points[9], points[10]));
-		links.Add(new VeryLett.ClothLink(points[10], points[11]));
-
-		links.Add(new VeryLett.ClothLink(points[12], points[13]));
-		links.Add(new VeryLett.ClothLink(points[13], points[14]));
-		links.Add(new VeryLett.ClothLink(points[14], points[15]));
-
-		// Horizontal links
-		links.Add(new VeryLett.ClothLink(points[0], points[4]));
-		links.Add(new VeryLett.ClothLink(points[1], points[5]));
-		links.Add(new VeryLett.ClothLink(points[2], points[6]));
-		links.Add(new VeryLett.ClothLink(points[3], points[7]));
-
-		links.Add(new VeryLett.ClothLink(points[4], points[8]));
-		links.Add(new VeryLett.ClothLink(points[5], points[9]));
-		links.Add(new VeryLett.ClothLink(points[6], points[10]));
-		links.Add(new VeryLett.ClothLink(points[7], points[11]));
-
-		links.Add(new VeryLett.ClothLink(points[8], points[12]));
-		links.Add(new VeryLett.ClothLink(points[9], points[13]));
-		links.Add(new VeryLett.ClothLink(points[10], points[14]));
-		links.Add(new VeryLett.ClothLink(points[11], points[15]));
-
-		// Cross links
-		links.Add(new VeryLett.ClothLink(points[0], points[5]));
-		links.Add(new VeryLett.ClothLink(points[1], points[6]));
-		links.Add(new VeryLett.ClothLink(points[2], points[7]));
-		links.Add(new VeryLett.ClothLink(points[1], points[4]));
-		links.Add(new VeryLett.ClothLink(points[2], points[5]));
-		links.Add(new VeryLett.ClothLink(points[3], points[6]));
-
-		links.Add(new VeryLett.ClothLink(points[4], points[9]));
-		links.Add(new VeryLett.ClothLink(points[5], points[10]));
-		links.Add(new VeryLett.ClothLink(points[6], points[11]));
-		links.Add(new VeryLett.ClothLink(points[5], points[8]));
-		links.Add(new VeryLett.ClothLink(points[6], points[9]));
-		links.Add(new VeryLett.ClothLink(points[7], points[10]));
-
-		links.Add(new VeryLett.ClothLink(points[8],  points[13]));
-		links.Add(new VeryLett.ClothLink(points[9],  points[14]));
-		links.Add(new VeryLett.ClothLink(points[10], points[15]));
-		links.Add(new VeryLett.ClothLink(points[9],  points[12]));
-		links.Add(new VeryLett.ClothLink(points[10], points[13]));
-		links.Add(new VeryLett.ClothLink(points[11], points[14]));
-	}
+            Debug.Log("MeshToCloth: Generating cloth from mesh...");
+            Debug.Log("MeshToCloth: Converted vertices -> points: " + vertices.Length + " -> " + points.Count);
+            Debug.Log("MeshToCloth: Number of triangles (arraylength): " + (triangles.Length/3) + " ("+ triangles.Length +")");
+            Debug.Log("MeshToCloth: Converted edges -> links: " + edges.Count + " -> " + links.Count);
+        }
+    }
 }
