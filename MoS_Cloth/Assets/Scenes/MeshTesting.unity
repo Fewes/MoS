@@ -376,9 +376,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 0.1
+  mass: 5
   springCoefficient: 10
-  dampeningCoefficient: 3
+  dampeningCoefficient: 5
   simTime: 0.005
   gravityMultiplier: 1
 --- !u!4 &1089119120
@@ -405,7 +405,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 629c71ac44a0e7e43a7d7bbdadb93827, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mesh: {fileID: 0}
+  mesh: {fileID: 4300002, guid: 4ca0a58dbfd7089439e21d56a1530f67, type: 3}
+  PinFirstAndLastPoint: 0
+  MergeUVBorders: 1
 --- !u!1 &1763439048
 GameObject:
   m_ObjectHideFlags: 0
