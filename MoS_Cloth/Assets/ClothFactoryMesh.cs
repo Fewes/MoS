@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
- * TODO: Unity duplicates vertices for UV borders, which means meshes become segmented.
- *       - Detect which points are duplicates and create a new vertex list before generating the rest
- *       - Remember to update the triangle IDs to not point at invalid indices
+ * TODO: Normals and UVs need to be updated when merging borders in MergeOverlappingVertices
  */
 
 public class ClothFactoryMesh : ClothFactory
@@ -13,6 +11,7 @@ public class ClothFactoryMesh : ClothFactory
 	[SerializeField]
 	Mesh		mesh;
     public bool PinFirstAndLastPoint = true;
+    public bool MergeUVBorders = true;
 
     public class Edge
     {
@@ -56,7 +55,7 @@ public class ClothFactoryMesh : ClothFactory
         }
     }
 
-    public bool TrianglesToEdges(int[] triangles, List<ClothFactoryMesh.Edge> edges)
+    public bool TrianglesToEdges(ref int[] triangles, List<ClothFactoryMesh.Edge> edges)
     {
         edges.Clear();
 
@@ -76,6 +75,86 @@ public class ClothFactoryMesh : ClothFactory
         return (edges.Count > 0);
     }
 
+    public void ReplaceVertexInTriangleList(int vertex, int replacement, List<int> triangles)
+    {
+        for (int i=0; i<triangles.Count; i++)
+        {
+            if (triangles[i] == vertex)
+            {
+                triangles[i] = replacement;
+            }
+        }
+    }
+
+    public void ReadjustTriangleListAfterRemoval(int removedVertex, int replacement, List<int> triangles)
+    {
+        if (removedVertex > replacement)
+        {
+            for (int i = 0; i < triangles.Count; i++)
+            {
+                if (triangles[i] > removedVertex)
+                {
+                    triangles[i]--;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < triangles.Count; i++)
+            {
+                if (triangles[i] < removedVertex)
+                {
+                    triangles[i]++;
+                }
+            }
+        }
+    }
+
+    public void MergeOverlappingVertices(ref Vector3[] vertices, ref int[] triangles, ref Color32[] colors)
+    {
+        List<Vector3> newVertices = new List<Vector3>(vertices);
+        List<int> newTriangles = new List<int>(triangles);
+        List<Color32> newColors = new List<Color32>(colors);
+
+        List<int> duplicates = new List<int>();
+
+        bool adjustColors = colors.Length > 0;
+
+        // Naive implementation which merges vertices in the exact same location
+        int lastIndex = newVertices.Count - 1;
+        for (int i=0; i<=lastIndex; i++)
+        {
+            duplicates.Clear();
+            Vector3 vertex = newVertices[i];
+
+            // Store duplicates and remove them from the vertex list
+            for (int j=lastIndex; j>i; j--)
+            {
+                if (vertex.Equals(newVertices[j]))
+                {
+                    duplicates.Add(j);
+                    newVertices.RemoveAt(j);
+
+                    if (adjustColors) newColors.RemoveAt(j);
+
+                    lastIndex--;
+                }
+            }
+
+            for (int j = 0; j < duplicates.Count; j++)
+            {
+                // If a vertex is removed, parts of the triangle array gets an index with faulty offset +/- 1
+                // and must be recalculated
+                ReplaceVertexInTriangleList(duplicates[j], i, newTriangles);
+                ReadjustTriangleListAfterRemoval(duplicates[j], i, newTriangles);
+            }
+        }
+
+        vertices = newVertices.ToArray();
+        triangles = newTriangles.ToArray();
+        colors = newColors.ToArray();
+    }
+
 	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links)
 	{
 		points = new List<VeryLett.ClothPoint>();
@@ -85,12 +164,22 @@ public class ClothFactoryMesh : ClothFactory
         {
             Vector3[] vertices = mesh.vertices;
             int[] triangles = mesh.triangles;
+            Color32[] colors = mesh.colors32;
 
-            int i = 0;
-            while (i < vertices.Length)
+            if (MergeUVBorders)
+            {
+                MergeOverlappingVertices(ref vertices, ref triangles, ref colors);
+            }
+
+            int i;
+            for (i=0; i < vertices.Length; i++)
             {
                 points.Add(new VeryLett.ClothPoint(transform.position + vertices[i]));
-                i++;
+            }
+
+            for (i=0; i<colors.Length; i++)
+            {
+                points[i].fixd = (colors[i].r == 255);
             }
 
             if (PinFirstAndLastPoint)
@@ -100,7 +189,7 @@ public class ClothFactoryMesh : ClothFactory
             }
 
             List<ClothFactoryMesh.Edge> edges = new List<ClothFactoryMesh.Edge>();
-            if (TrianglesToEdges(triangles, edges))
+            if (TrianglesToEdges(ref triangles, edges))
             {
                 foreach (var edge in edges)
                 {
