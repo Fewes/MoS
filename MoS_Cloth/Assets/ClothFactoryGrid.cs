@@ -25,13 +25,13 @@ public class ClothFactoryGrid : ClothFactory
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
-        int numPixelsX = cellsX + 1 ;
-        int numPixelsY = cellsY + 1;
+        int numPointsX = cellsX + 1 ;
+        int numPointsY = cellsY + 1;
 
         // Add points
-       for (int y = 0; y < numPixelsY; y++)
+       for (int y = 0; y < numPointsY; y++)
         {
-            for (int x = 0; x < numPixelsX; x++)
+            for (int x = 0; x < numPointsX; x++)
             {
                 // for each row , jump to the start of the dimensional square and create points with a set distance to the right.
                 points.Add(new VeryLett.ClothPoint(transform.position -Vector3.up * y * (dimY/cellsY) -Vector3.right * (dimX/2) + Vector3.right * x * (dimX/cellsX)));
@@ -39,23 +39,34 @@ public class ClothFactoryGrid : ClothFactory
             }
         }
 
-        // Add links horizontal
-        for (int rowNum = 0; rowNum <= numPixelsY; ++rowNum)
+        
+        for (int y = 0; y <= cellsY; ++y)
         {
-            for (int link = 0; link < cellsX; ++link)
+            for (int x = 0; x < cellsX; x++)
             {
-                links.Add(new VeryLett.ClothLink(points[rowNum * numPixelsX + link], points[rowNum * numPixelsX + link + 1]));
+                int currentRow = y * numPointsX;
+                int currentColumn = x;
+                int nextColumn = x + 1;
+                int nextRow = currentRow + numPointsX;
+                // Add links horizontal
+                links.Add(new VeryLett.ClothLink(points[currentRow + currentColumn], points[currentRow + nextColumn]));
+                // Add links vertical
+                //links.Add(new VeryLett.ClothLink(points[currentRow + currentColumn], points[nextRow + currentColumn]));  <----- Vägrar fungera! 
+                print(currentRow + x);
+                print(currentRow + (x + 1));
             }
         }
 
-        // Add links vertical
-        for (int colNum = 0; colNum <= numPixelsX; ++colNum)
-        {
-            for (int link = 0; link < cellsY; ++link)
-            {
-                links.Add(new VeryLett.ClothLink(points[colNum * numPixelsY + link * numPixelsX], points[colNum * numPixelsY + link * numPixelsX + numPixelsX])); //Funkar ej
-                //links.Add(new VeryLett.ClothLink(points[0], points[4]));  <-- Det funkar inte heller
-            }
-        }
+        ////Add links vertical
+        //for (int y = 0; y <= numPointsY; ++y)
+        //{
+        //    for (int x = 0; x < cellsY; ++x)
+        //    {
+        //        int currentRow = y * numPointsX;
+        //        int nextRow = (y + 1) * numPointsX;
+
+        //        links.Add(new VeryLett.ClothLink(points[currentRow + x], points[nextRow + x + 1]));
+        //    }
+        //}
     }
 }
