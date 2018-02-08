@@ -396,7 +396,8 @@ MonoBehaviour:
   springCoefficient: 1
   dampeningCoefficient: 4
   simTime: 0.005
-  gravityMultiplier: 0.086
+  gravityMultiplier: 1
+  solver: 0
 --- !u!4 &1474893475
 Transform:
   m_ObjectHideFlags: 0
@@ -460,6 +461,7 @@ MonoBehaviour:
   dampeningCoefficient: 2
   simTime: 0.005
   gravityMultiplier: 1
+  solver: 0
 --- !u!4 &1525859938
 Transform:
   m_ObjectHideFlags: 0

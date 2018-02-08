@@ -8,6 +8,7 @@ public class VeryLett : MonoBehaviour
 	{
 		public Vector3	position;
 		public Vector3	velocity;
+        public Vector3  accumulatedVelocity;
 		public bool		fixd;	
 
 		public ClothPoint (Vector3 pos)
@@ -46,21 +47,50 @@ public class VeryLett : MonoBehaviour
             Vector3 force = k * dir * (dist - restDist);
 
             // Apply force to both points
-            A.velocity += force / pointMass * st;
-            B.velocity -= force / pointMass * st;
+            A.accumulatedVelocity += force / pointMass * st;
+            B.accumulatedVelocity -= force / pointMass * st;
         }
-	}
 
-	// Public
-	public float		mass					= 1;
+        public void SolveLinkWithDamper(float k, float st, float pointMass, float dampeningCoefficient)
+        {
+            // Relative vector going from A to B
+            Vector3 r = B.position - A.position;
+            float Rm = r.magnitude;
+            Vector3 Rn = r / r.magnitude;
+
+            // Calculate spring force
+            Vector3 force = k * (Rm - restDist) * Rn;
+
+            // Calculate dampening
+            Vector3 Fa = dampeningCoefficient * Vector3.Project(A.velocity, Rn); // hastighet
+            Vector3 Fb = dampeningCoefficient * Vector3.Project(B.velocity, Rn); // hastighet
+            //Vector3 Fa = dampeningCoefficient * Vector3.Dot(A.velocity, r) * r / (Rm*Rm);
+            //Vector3 Fb = dampeningCoefficient * Vector3.Dot(B.velocity, r) * r / (Rm*Rm);
+
+            // Store accumulated velocities for later
+            Vector3 springDisplacement = force / pointMass * st;
+            A.accumulatedVelocity += springDisplacement - Fa / pointMass * st;
+            B.accumulatedVelocity -= springDisplacement + Fb / pointMass * st;
+        }
+    }
+
+    [System.Serializable]
+    public enum SolverEnum { Default, InternalDamperForce };
+
+    // Public
+    public float		mass					= 1;
 	public float		springCoefficient		= 10;
-	public float		dampeningCoefficient	= 3;
+    public float		globalDampening	        = 0;
 	public float		simTime					= 0.005f;
 	[Range(0, 1)]
 	public float		gravityMultiplier		= 0.25f;
+    public SolverEnum   solver                  = SolverEnum.Default;
 
-	// Private
-	float				remainder;
+    [Range(0, 0.2f)]
+    public float        internalDampening       = 0.01f;
+
+    // Private
+    float				remainder;
 
     List<ClothPoint>	points;
 	List<ClothLink>		links;
@@ -104,15 +134,36 @@ public class VeryLett : MonoBehaviour
 		{
             // Apply gravity
             foreach (var point in points)
-                point.velocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
+            {
+                point.accumulatedVelocity = Vector3.zero;
+                point.accumulatedVelocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
+            }
 
             // Calculate link constraints
-            foreach (var link in links)
-                link.SolveLink(springCoefficient, simTime, pointMass);
+            if (solver == SolverEnum.InternalDamperForce)
+            {
+                foreach (var link in links)
+                {
+                    link.SolveLinkWithDamper(springCoefficient, simTime, pointMass, internalDampening);
+                }
 
-            // Apply dampening
+            }
+            else // SolverEnum.Default
+            {
+                foreach (var link in links)
+                {
+                    link.SolveLink(springCoefficient, simTime, pointMass);
+                }
+            }
+
             foreach (var point in points)
-                point.velocity *= Mathf.Max(1 - simTime * dampeningCoefficient, 0);
+            {
+                point.velocity += point.accumulatedVelocity;
+            }
+
+            // Apply global dampening
+            foreach (var point in points)
+                point.velocity *= Mathf.Max(1 - simTime * globalDampening, 0);
 
             // Apply forces
             foreach (var point in points)
