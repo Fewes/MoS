@@ -9,6 +9,7 @@ public class ClothFactoryGrid : ClothFactory
 	public int		cellsX;
 	public int		cellsY;
     public bool     crossLinks = false;
+    public bool     attachTopCorners = false;
 
 	void OnDrawGizmos ()
 	{
@@ -37,7 +38,7 @@ public class ClothFactoryGrid : ClothFactory
         {
             for (int x = 0; x < numPointsX; x++)
             {
-                points.Add(new VeryLett.ClothPoint(origin + stepX * x - stepY * y));
+                points.Add(new VeryLett.ClothPoint(origin + stepX * x - stepY * y + Random.onUnitSphere * Mathf.Epsilon));
             }
         }
 
@@ -99,6 +100,12 @@ public class ClothFactoryGrid : ClothFactory
                     links.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
                 }
             }
+        }
+
+        if (attachTopCorners)
+        {
+            points[0].fixd = true;
+            points[cellsX].fixd = true;
         }
     }
 }

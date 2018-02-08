@@ -31,24 +31,24 @@ public class VeryLett : MonoBehaviour
 			restDist = Vector3.Distance(A.position, B.position);
 		}
 
-		public void SolveLink (float k, float st)
-		{
-			// Relative vector going from A to B
-			Vector3 dir = B.position-A.position;
+        public void SolveLink(float k, float st, float pointMass)
+        {
+            // Relative vector going from A to B
+            Vector3 dir = B.position - A.position;
 
-			// Current distance between A and B
-			float dist = dir.magnitude;
+            // Current distance between A and B
+            float dist = dir.magnitude;
 
-			// Normalize directional vector
-			dir /= dist;
+            // Normalize directional vector
+            dir /= dist;
 
-			// Calculate spring force
-			Vector3 force = dir * (dist - restDist) * k * st;
+            // Calculate spring force
+            Vector3 force = k * dir * (dist - restDist);
 
-			// Apply force to both points
-			A.velocity += force;
-			B.velocity -= force;
-		}
+            // Apply force to both points
+            A.velocity += force / pointMass * st;
+            B.velocity -= force / pointMass * st;
+        }
 	}
 
 	// Public
@@ -62,15 +62,15 @@ public class VeryLett : MonoBehaviour
 	// Private
 	float				remainder;
 
-	List<ClothPoint>	points;
+    List<ClothPoint>	points;
 	List<ClothLink>		links;
 	
 	void Start ()
 	{
 		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links);
-	}
-	
-	void OnDrawGizmos ()
+    }
+
+    void OnDrawGizmos ()
 	{
 		if (points == null || links == null)
 			return;
@@ -92,32 +92,32 @@ public class VeryLett : MonoBehaviour
 	
 	void Update ()
 	{
-		//points[0].position = transform.position;
+        if (points == null) return;
+        float pointMass = mass / points.Count;
 
-		float pointMass = mass / points.Count;
-		
-		float dt = Time.deltaTime + remainder;
+        points[0].position = transform.position;
+        float dt = Time.deltaTime + remainder;
 		int simSteps = (int)Mathf.Floor(dt / simTime);
 		remainder = dt - simSteps * simTime;
 
 		for (int i = 0; i < simSteps; i++)
 		{
-			// Apply gravity
-			foreach (var point in points)
-				point.velocity += Physics.gravity * pointMass * simTime * gravityMultiplier;
+            // Apply gravity
+            foreach (var point in points)
+                point.velocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
 
-			// Calculate link constraints
-			foreach (var link in links)
-				link.SolveLink(springCoefficient, simTime);
+            // Calculate link constraints
+            foreach (var link in links)
+                link.SolveLink(springCoefficient, simTime, pointMass);
 
-			// Apply dampening
-			foreach (var point in points)
-				point.velocity *= Mathf.Max(1 - simTime * dampeningCoefficient, 0);
+            // Apply dampening
+            foreach (var point in points)
+                point.velocity *= Mathf.Max(1 - simTime * dampeningCoefficient, 0);
 
-			// Apply forces
-			foreach (var point in points)
-				if (!point.fixd)
-					point.position += point.velocity;
-		}
+            // Apply forces
+            foreach (var point in points)
+                if (!point.fixd)
+                    point.position += point.velocity * simTime; // m/s * s = m
+        }
 	}
 }
