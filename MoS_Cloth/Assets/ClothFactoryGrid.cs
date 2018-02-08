@@ -8,6 +8,7 @@ public class ClothFactoryGrid : ClothFactory
 	public float	dimY;
 	public int		cellsX;
 	public int		cellsY;
+    public bool     crossLinks = false;
 
 	void OnDrawGizmos ()
 	{
@@ -25,48 +26,79 @@ public class ClothFactoryGrid : ClothFactory
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
-        int numPointsX = cellsX + 1 ;
+        int numPointsX = cellsX + 1;
         int numPointsY = cellsY + 1;
 
         // Add points
-       for (int y = 0; y < numPointsY; y++)
+        Vector3 stepY = Vector3.up * (dimY / cellsY);
+        Vector3 stepX = Vector3.right * (dimX / cellsX);
+        Vector3 origin = transform.position - Vector3.right * (dimX / 2);
+        for (int y = 0; y < numPointsY; y++)
         {
             for (int x = 0; x < numPointsX; x++)
             {
-                // for each row , jump to the start of the dimensional square and create points with a set distance to the right.
-                points.Add(new VeryLett.ClothPoint(transform.position -Vector3.up * y * (dimY/cellsY) -Vector3.right * (dimX/2) + Vector3.right * x * (dimX/cellsX)));
-               // Debug.Log(dimX/cellsX);
+                points.Add(new VeryLett.ClothPoint(origin + stepX * x - stepY * y));
             }
         }
 
-        
-        for (int y = 0; y <= cellsY; ++y)
+        // Add horizontal links
+        for (int y = 0; y < numPointsY; y++)
         {
-            for (int x = 0; x < cellsX; x++)
+            int currentRow = y * numPointsX;
+
+            for (int x = 1; x < numPointsX; x++)
             {
-                int currentRow = y * numPointsX;
-                int currentColumn = x;
-                int nextColumn = x + 1;
-                int nextRow = currentRow + numPointsX;
-                // Add links horizontal
-                links.Add(new VeryLett.ClothLink(points[currentRow + currentColumn], points[currentRow + nextColumn]));
-                // Add links vertical
-                //links.Add(new VeryLett.ClothLink(points[currentRow + currentColumn], points[nextRow + currentColumn]));  <----- Vägrar fungera! 
-                print(currentRow + x);
-                print(currentRow + (x + 1));
+                int currentIndex = currentRow + x;
+                links.Add(new VeryLett.ClothLink(points[currentIndex-1], points[currentIndex]));
             }
         }
 
-        ////Add links vertical
-        //for (int y = 0; y <= numPointsY; ++y)
-        //{
-        //    for (int x = 0; x < cellsY; ++x)
-        //    {
-        //        int currentRow = y * numPointsX;
-        //        int nextRow = (y + 1) * numPointsX;
+        // Add vertical links
+        for (int y = 1; y < numPointsY; y++)
+        {
+            int previousRow = (y-1) * numPointsX;
+            int currentRow = y * numPointsX;
 
-        //        links.Add(new VeryLett.ClothLink(points[currentRow + x], points[nextRow + x + 1]));
-        //    }
-        //}
+            for (int x = 0; x < numPointsX; x++)
+            {
+                int previousIndex = previousRow + x;
+                int currentIndex = currentRow + x;
+
+                links.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
+            }
+        }
+
+        // Cross-link
+        // Add first set of vertical links
+        for (int y = 1; y < numPointsY; y++)
+        {
+            int previousRow = (y - 1) * numPointsX;
+            int currentRow = y * numPointsX;
+
+            for (int x = 0; x < (numPointsX-1); x++)
+            {
+                int previousIndex = previousRow + x;
+                int currentIndex = currentRow + x + 1;
+
+                links.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
+            }
+        }
+
+        if (crossLinks)
+        {
+            for (int y = 1; y < numPointsY; y++)
+            {
+                int previousRow = (y - 1) * numPointsX;
+                int currentRow = y * numPointsX;
+
+                for (int x = 0; x < (numPointsX - 1); x++)
+                {
+                    int previousIndex = previousRow + x + 1;
+                    int currentIndex = currentRow + x;
+
+                    links.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
+                }
+            }
+        }
     }
 }

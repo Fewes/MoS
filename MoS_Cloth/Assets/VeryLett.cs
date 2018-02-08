@@ -92,7 +92,7 @@ public class VeryLett : MonoBehaviour
 	
 	void Update ()
 	{
-		points[0].position = transform.position;
+		//points[0].position = transform.position;
 
 		float pointMass = mass / points.Count;
 		
