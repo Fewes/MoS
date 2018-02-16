@@ -31,6 +31,9 @@ public class ClothFactoryGrid : ClothFactory
         int numPointsX = cellsX + 1;
         int numPointsY = cellsY + 1;
 
+		Vector3[] vertices = new Vector3[numPointsX * numPointsY];
+		int i = 0;
+
         // Add points
         Vector3 stepY = transform.up * (dimY / cellsY);
         Vector3 stepX = transform.right * (dimX / cellsX);
@@ -39,7 +42,9 @@ public class ClothFactoryGrid : ClothFactory
         {
             for (int x = 0; x < numPointsX; x++)
             {
-                points.Add(new VeryLett.ClothPoint(origin + stepX * x - stepY * y + Random.onUnitSphere * Mathf.Epsilon));
+				var pos = origin + stepX * x - stepY * y + Random.onUnitSphere * Mathf.Epsilon;
+                points.Add(new VeryLett.ClothPoint(pos, new int[] {i}));
+				vertices[i++] = transform.InverseTransformPoint(pos);
             }
         }
 
@@ -108,5 +113,32 @@ public class ClothFactoryGrid : ClothFactory
             points[0].pinned = true;
             points[cellsX].pinned = true;
         }
+
+		// Initialize the mesh object
+		if (!meshFilter)
+			meshFilter = gameObject.AddComponent<MeshFilter>();
+
+		int[] triangles = new int[cellsX*cellsY*2*3];
+		i = 0;
+		for (int y = 0; y < cellsY; y++)
+        {
+            for (int x = 0; x < cellsX; x++)
+            {
+				// Triangle 1
+				triangles[i++] = numPointsX * y + x;
+				triangles[i++] = numPointsX * y + x + 1;
+				triangles[i++] = numPointsX * y + x + numPointsX;
+				// Triangle 2
+				triangles[i++] = numPointsX * y + x + 1;
+				triangles[i++] = numPointsX * y + x + numPointsX + 1;
+				triangles[i++] = numPointsX * y + x + numPointsX;
+			}
+		}
+
+		Mesh mesh = new Mesh();
+		mesh.name = gameObject.name + "_VeryLettMesh";
+		mesh.vertices = vertices;
+		mesh.triangles = triangles;
+		meshFilter.sharedMesh = mesh;
     }
 }
