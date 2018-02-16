@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18204573, g: 0.22434936, b: 0.28772676, a: 1}
+  m_IndirectSpecularColor: {r: 0.1820459, g: 0.2243495, b: 0.2877268, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -394,7 +394,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1
+  preset: 2
+  massPerSquareMeter: 1
   springCoefficient: 200
   globalDampening: 5
   simTime: 0.005
@@ -499,7 +500,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1
+  preset: 0
+  massPerSquareMeter: 1
   springCoefficient: 20
   globalDampening: 4
   simTime: 0.005
@@ -644,7 +646,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 2
+  preset: 0
+  massPerSquareMeter: 1
   springCoefficient: 20
   globalDampening: 4
   simTime: 0.005

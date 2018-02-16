@@ -109,8 +109,8 @@ public class VeryLett : MonoBehaviour
         switch (preset)
         {
             case PresetEnum.Wool:
-                mass = 1.2f;
-                springCoefficient = 50;
+                massPerSquareMeter = 0.4f;
+                springCoefficient = 70;
                 globalDampening = 4;
                 internalDampening = 0.002f;
                 crossLinkStrength = 0.04f;
@@ -118,8 +118,8 @@ public class VeryLett : MonoBehaviour
                 break;
 
             case PresetEnum.Silk:
-                mass = 0.75f;
-                springCoefficient = 100;
+                massPerSquareMeter = 0.25f;
+                springCoefficient = 80;
                 globalDampening = 4;
                 internalDampening = 0.002f;
                 crossLinkStrength = 0.1f;
@@ -127,7 +127,7 @@ public class VeryLett : MonoBehaviour
                 break;
 
             case PresetEnum.Leather:
-                mass = 10;
+                massPerSquareMeter = 3.3f;
                 springCoefficient = 220;
                 globalDampening = 1;
                 internalDampening = 0.04f;
@@ -154,7 +154,7 @@ public class VeryLett : MonoBehaviour
     public PresetEnum   preset                  = PresetEnum.Default;
     PresetEnum          tempPreset              = PresetEnum.Default;
 
-    public float		mass					= 1;
+    public float		massPerSquareMeter		= 1;
 	public float		springCoefficient		= 10;
 	public float		globalDampening			= 0;
 	public float		simTime					= 0.005f;
@@ -240,7 +240,8 @@ public class VeryLett : MonoBehaviour
             SetPreset(preset);
 
 		if (points == null) return;
-		float pointMass = mass / points.Count;
+        float clothArea = GetComponent<ClothFactory>().GetArea();
+        float pointMass = massPerSquareMeter * clothArea / points.Count;
 
 		points[0].position = transform.position;
 		float dt = Time.deltaTime + remainder;
