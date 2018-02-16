@@ -32,9 +32,9 @@ public class ClothFactoryGrid : ClothFactory
         int numPointsY = cellsY + 1;
 
         // Add points
-        Vector3 stepY = Vector3.up * (dimY / cellsY);
-        Vector3 stepX = Vector3.right * (dimX / cellsX);
-        Vector3 origin = transform.position - Vector3.right * (dimX / 2);
+        Vector3 stepY = transform.up * (dimY / cellsY);
+        Vector3 stepX = transform.right * (dimX / cellsX);
+        Vector3 origin = transform.position - transform.right * (dimX / 2);
         for (int y = 0; y < numPointsY; y++)
         {
             for (int x = 0; x < numPointsX; x++)
