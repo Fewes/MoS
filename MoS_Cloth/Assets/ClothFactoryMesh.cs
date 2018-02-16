@@ -155,7 +155,7 @@ public class ClothFactoryMesh : ClothFactory
         colors = newColors.ToArray();
     }
 
-	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks)
+	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks, ref MeshFilter meshFilter)
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
@@ -179,13 +179,13 @@ public class ClothFactoryMesh : ClothFactory
 
             for (i=0; i<colors.Length; i++)
             {
-                points[i].fixd = (colors[i].r == 255);
+                points[i].pinned = (colors[i].r == 255);
             }
 
             if (PinFirstAndLastPoint)
             {
-                points[0].fixd = true;
-                points[points.Count-1].fixd = true;
+                points[0].pinned = true;
+                points[points.Count-1].pinned = true;
             }
 
             List<ClothFactoryMesh.Edge> edges = new List<ClothFactoryMesh.Edge>();

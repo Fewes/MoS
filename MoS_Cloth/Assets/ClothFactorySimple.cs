@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ClothFactorySimple : ClothFactory
 {
-	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks)
+	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks, ref MeshFilter meshFilter)
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
@@ -29,10 +29,10 @@ public class ClothFactorySimple : ClothFactory
 		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 0.66f + Vector3.right * 0.99f));
 		points.Add(new VeryLett.ClothPoint(transform.position - Vector3.up * 1.00f + Vector3.right * 0.99f));
 
-		points[0].fixd = true;
-		//points[4].fixd = true;
-		//points[8].fixd = true;
-		points[12].fixd = true;
+		points[0].pinned = true;
+		//points[4].pinned = true;
+		//points[8].pinned = true;
+		points[12].pinned = true;
 
 		// Vertical links
 		links.Add(new VeryLett.ClothLink(points[0], points[1]));

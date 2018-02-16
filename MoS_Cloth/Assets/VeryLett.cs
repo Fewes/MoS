@@ -9,13 +9,22 @@ public class VeryLett : MonoBehaviour
 		public Vector3	position;
 		public Vector3	velocity;
 		public Vector3  accumulatedVelocity;
-        public bool     fixd;
+        public bool     pinned;
+		public int[]	vIndices;
 
 		public ClothPoint (Vector3 pos)
 		{
 			position = pos;
 			velocity = Vector3.zero;
-			fixd = false;
+			pinned = false;
+		}
+
+		public ClothPoint (Vector3 pos, int[] indices)
+		{
+			position = pos;
+			velocity = Vector3.zero;
+			pinned = false;
+			vIndices = indices;
 		}
 	}
 
@@ -95,10 +104,18 @@ public class VeryLett : MonoBehaviour
 	List<ClothPoint>	points;
 	List<ClothLink>		links;
     List<ClothLink>     xLinks;
+
+	MeshFilter			meshFilter;
+	Vector3[]			vertices;
 	
 	void Start ()
 	{
-		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks);
+		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
+		if (meshFilter)
+		{
+			meshFilter.sharedMesh.MarkDynamic();
+			vertices = meshFilter.sharedMesh.vertices;
+		}
 	}
 
 	void OnDrawGizmos ()
@@ -184,8 +201,32 @@ public class VeryLett : MonoBehaviour
 
 			// Apply forces
 			foreach (var point in points)
-			if (!point.fixd)
+			if (!point.pinned)
 				point.position += point.velocity * simTime; // m/s * s = m
 		}
+
+		UpdateMesh();
+	}
+
+	void UpdateMesh ()
+	{
+		if (!meshFilter)
+			return;
+
+		foreach (var point in points)
+		{
+			if (point.vIndices == null)
+				continue;
+
+			foreach (var i in point.vIndices)
+			{
+				vertices[i] = meshFilter.transform.InverseTransformPoint(point.position);
+			}
+		}
+
+		meshFilter.sharedMesh.vertices = vertices;
+		meshFilter.sharedMesh.RecalculateBounds();
+		meshFilter.sharedMesh.RecalculateNormals();
+		meshFilter.sharedMesh.RecalculateTangents();
 	}
 }
