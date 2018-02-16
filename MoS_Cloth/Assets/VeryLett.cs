@@ -101,11 +101,60 @@ public class VeryLett : MonoBehaviour
 		}
 	}
 
+    public void SetPreset(PresetEnum newPreset)
+    {
+        tempPreset = newPreset;
+        preset = newPreset;
+
+        switch (preset)
+        {
+            case PresetEnum.Wool:
+                mass = 1.2f;
+                springCoefficient = 50;
+                globalDampening = 4;
+                internalDampening = 0.002f;
+                crossLinkStrength = 0.04f;
+                solver = SolverEnum.InternalDamperForce;
+                break;
+
+            case PresetEnum.Silk:
+                mass = 0.75f;
+                springCoefficient = 100;
+                globalDampening = 4;
+                internalDampening = 0.002f;
+                crossLinkStrength = 0.1f;
+                solver = SolverEnum.InternalDamperForce;
+                break;
+
+            case PresetEnum.Leather:
+                mass = 10;
+                springCoefficient = 220;
+                globalDampening = 1;
+                internalDampening = 0.04f;
+                crossLinkStrength = 1.5f;
+                solver = SolverEnum.InternalDamperForce;
+                break;
+
+            case PresetEnum.Default:
+                
+                break;
+
+        }
+    }
+
 	[System.Serializable]
 	public enum SolverEnum { Default, InternalDamperForce };
 
-	// Public
-	public float		mass					= 1;
+    [System.Serializable]
+    public enum PresetEnum { Default, Wool, Silk , Leather };
+
+
+    // Public
+    [SerializeField]
+    public PresetEnum   preset                  = PresetEnum.Default;
+    PresetEnum          tempPreset              = PresetEnum.Default;
+
+    public float		mass					= 1;
 	public float		springCoefficient		= 10;
 	public float		globalDampening			= 0;
 	public float		simTime					= 0.005f;
@@ -134,7 +183,9 @@ public class VeryLett : MonoBehaviour
 
     void Start ()
 	{
-		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
+        SetPreset(preset);
+
+        GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
         attachedPoints = new List<ClothPointAttachment>();
 
         if (meshFilter)
@@ -185,6 +236,9 @@ public class VeryLett : MonoBehaviour
 	
 	void Update ()
 	{
+        if (tempPreset != preset)
+            SetPreset(preset);
+
 		if (points == null) return;
 		float pointMass = mass / points.Count;
 
