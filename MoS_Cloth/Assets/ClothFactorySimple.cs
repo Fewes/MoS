@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ClothFactorySimple : ClothFactory
 {
-	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links)
+	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks)
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();

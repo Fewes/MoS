@@ -23,10 +23,11 @@ public class ClothFactoryGrid : ClothFactory
 		Gizmos.DrawLine(p2, p0);
 	}
 
-	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links)
+	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks)
 	{
 		points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
+        xLinks = new List<VeryLett.ClothLink>();
         int numPointsX = cellsX + 1;
         int numPointsY = cellsY + 1;
 
@@ -81,7 +82,7 @@ public class ClothFactoryGrid : ClothFactory
                 int previousIndex = previousRow + x;
                 int currentIndex = currentRow + x + 1;
 
-                links.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
+                xLinks.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
             }
         }
 
@@ -97,7 +98,7 @@ public class ClothFactoryGrid : ClothFactory
                     int previousIndex = previousRow + x + 1;
                     int currentIndex = currentRow + x;
 
-                    links.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
+                    xLinks.Add(new VeryLett.ClothLink(points[previousIndex], points[currentIndex]));
                 }
             }
         }

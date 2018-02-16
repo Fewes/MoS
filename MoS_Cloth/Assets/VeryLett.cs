@@ -9,7 +9,7 @@ public class VeryLett : MonoBehaviour
 		public Vector3	position;
 		public Vector3	velocity;
 		public Vector3  accumulatedVelocity;
-		public bool		fixd;	
+        public bool     fixd;
 
 		public ClothPoint (Vector3 pos)
 		{
@@ -86,16 +86,19 @@ public class VeryLett : MonoBehaviour
 
 	[Range(0, 0.2f)]
 	public float		internalDampening	   = 0.01f;
+    [Range(0, 2f)]
+    public float        crossLinkStrenght      = 0.5f;
 
 	// Private
 	float				remainder;
 
 	List<ClothPoint>	points;
 	List<ClothLink>		links;
+    List<ClothLink>     xLinks;
 	
 	void Start ()
 	{
-		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links);
+		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks);
 	}
 
 	void OnDrawGizmos ()
@@ -110,13 +113,20 @@ public class VeryLett : MonoBehaviour
 			Gizmos.DrawSphere(point.position, 0.025f);
 		}
 
-		// Draw links
+		// Draw horizontal and vertical links
 		foreach (var link in links)
 		{
 			Gizmos.color = Color.green * 10;
 			Gizmos.DrawLine(link.A.position, link.B.position);
 		}
-	}
+
+        // Draw crosslinks
+        foreach (var xLink in xLinks)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(xLink.A.position, xLink.B.position);
+        }
+    }
 	
 	void Update ()
 	{
@@ -145,14 +155,23 @@ public class VeryLett : MonoBehaviour
 					link.SolveLinkWithDamper(springCoefficient, simTime, pointMass, internalDampening);
 				}
 
-			}
+                foreach (var xLink in xLinks)
+                {
+                    xLink.SolveLinkWithDamper(springCoefficient * crossLinkStrenght, simTime, pointMass, internalDampening);
+                }
+
+            }
 			else // SolverEnum.Default
 			{
 				foreach (var link in links)
 				{
 					link.SolveLink(springCoefficient, simTime, pointMass);
 				}
-			}
+                foreach (var xLink in xLinks)
+                {
+                    xLink.SolveLink(springCoefficient * crossLinkStrenght, simTime, pointMass);
+                }
+            }
 
 			foreach (var point in points)
 			{
