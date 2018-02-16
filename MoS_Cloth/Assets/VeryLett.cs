@@ -28,7 +28,27 @@ public class VeryLett : MonoBehaviour
 		}
 	}
 
-	public class ClothLink
+    public class ClothPointAttachment
+    {
+        public ClothPoint point;
+        public Transform parent;
+        public Vector3 bindPosition;
+
+        public ClothPointAttachment(ClothPoint p, Transform parentTransform)
+        {
+            point = p;
+            parent = parentTransform;
+
+            bindPosition = parent.InverseTransformPoint(p.position);
+        }
+
+        public void UpdatePosition()
+        {
+            point.position = parent.TransformPoint(bindPosition);
+        }
+    }
+
+    public class ClothLink
 	{
 		public ClothPoint	A;
 		public ClothPoint	B;
@@ -91,15 +111,17 @@ public class VeryLett : MonoBehaviour
 	public float		simTime					= 0.005f;
 	[Range(0, 1)]
 	public float		gravityMultiplier		= 0.25f;
-	public SolverEnum   solver				  = SolverEnum.Default;
+	public SolverEnum   solver				    = SolverEnum.Default;
 
 	[Range(0, 0.2f)]
 	public float		internalDampening	   = 0.01f;
     [Range(0, 2f)]
-    public float        crossLinkStrenght      = 0.5f;
+    public float        crossLinkStrength      = 0.5f;
 
-	// Private
-	float				remainder;
+    public Transform    attachmentTransform    = null;
+
+    // Private
+    float				remainder;
 
 	List<ClothPoint>	points;
 	List<ClothLink>		links;
@@ -107,16 +129,32 @@ public class VeryLett : MonoBehaviour
 
 	MeshFilter			meshFilter;
 	Vector3[]			vertices;
-	
-	void Start ()
+
+    List<ClothPointAttachment> attachedPoints;
+
+    void Start ()
 	{
 		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
-		if (meshFilter)
+        attachedPoints = new List<ClothPointAttachment>();
+
+        if (meshFilter)
 		{
 			meshFilter.sharedMesh.MarkDynamic();
 			vertices = meshFilter.sharedMesh.vertices;
 		}
-	}
+
+        // Default attachment is the GameObject transform
+        if (!attachmentTransform) attachmentTransform = transform;
+
+        // Create list of attached points so that we can update them in the main Update loop
+        foreach (var p in points)
+        {
+            if (p.pinned)
+            {
+                attachedPoints.Add(new ClothPointAttachment(p, attachmentTransform));
+            }
+        }
+    }
 
 	void OnDrawGizmos ()
 	{
@@ -157,8 +195,14 @@ public class VeryLett : MonoBehaviour
 
 		for (int i = 0; i < simSteps; i++)
 		{
-			// Apply gravity
-			foreach (var point in points)
+            // Transform attached points
+            foreach (var p in attachedPoints)
+            {
+                p.UpdatePosition();
+            }
+
+            // Apply gravity
+            foreach (var point in points)
 			{
 				point.accumulatedVelocity = Vector3.zero;
 				point.accumulatedVelocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
@@ -174,7 +218,7 @@ public class VeryLett : MonoBehaviour
 
                 foreach (var xLink in xLinks)
                 {
-                    xLink.SolveLinkWithDamper(springCoefficient * crossLinkStrenght, simTime, pointMass, internalDampening);
+                    xLink.SolveLinkWithDamper(springCoefficient * crossLinkStrength, simTime, pointMass, internalDampening);
                 }
 
             }
@@ -186,7 +230,7 @@ public class VeryLett : MonoBehaviour
 				}
                 foreach (var xLink in xLinks)
                 {
-                    xLink.SolveLink(springCoefficient * crossLinkStrenght, simTime, pointMass);
+                    xLink.SolveLink(springCoefficient * crossLinkStrength, simTime, pointMass);
                 }
             }
 
