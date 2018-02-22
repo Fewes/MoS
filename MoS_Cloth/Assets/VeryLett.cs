@@ -108,6 +108,8 @@ public class VeryLett : MonoBehaviour
         public Vector3 direction = Vector3.forward;
         public float frequency = 0.6f;
         public float speed = 1.0f;
+        [Range(0, 10)]
+        public float power = 1;
 
         public Wind() {}
 
@@ -124,7 +126,7 @@ public class VeryLett : MonoBehaviour
 
         public float GetGustMultiplier(float worldx, float worldz)
         {
-            return Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency);
+            return Mathf.Pow(Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency),power);
         }
 
         public Vector3 GetForce(float worldx, float worldz, float area)
