@@ -405,9 +405,9 @@ MonoBehaviour:
   attachmentTransform: {fileID: 0}
   globalWind:
     direction: {x: 0, y: 0, z: 1}
-    frequency: 0.7
-    speed: 0.7
-    power: 4.41
+    frequency: 0.2
+    speed: 2
+    power: 1.87
 --- !u!4 &1009808580
 Transform:
   m_ObjectHideFlags: 0
@@ -415,7 +415,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1009808577}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.63, y: 3.53, z: 0.46}
+  m_LocalPosition: {x: 4.63, y: 3.53, z: 3.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -641,10 +641,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1763439048}
-  m_LocalRotation: {x: 0.043076433, y: -0, z: -0, w: 0.99907184}
-  m_LocalPosition: {x: 4.62, y: 2.21, z: -3.54}
+  m_LocalRotation: {x: 0.12979235, y: -0, z: -0, w: 0.9915412}
+  m_LocalPosition: {x: 4.62, y: 4.13, z: -3.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 4.938, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 14.915001, y: 0, z: 0}

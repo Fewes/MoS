@@ -108,7 +108,7 @@ public class VeryLett : MonoBehaviour
         public Vector3 direction = Vector3.forward;
         public float frequency = 0.6f;
         public float speed = 1.0f;
-        [Range(0, 10)]
+        [Range(1, 10)]
         public float power = 1;
 
         public Wind() {}
@@ -124,18 +124,20 @@ public class VeryLett : MonoBehaviour
             position += direction * speed * deltaTime;
         }
 
-        public float GetGustMultiplier(float worldx, float worldz)
+        public float GetGustMultiplier(float worldx, float worldz, float worldy)
         {
-            return Mathf.Pow(Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency),power);
+            float GustFloor = Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency);
+            float GustWall = Mathf.PerlinNoise((worldx - position.x) * frequency, (worldy - position.y) * frequency);
+            return Mathf.Pow((GustFloor + GustWall)/2,power);
         }
 
-        public Vector3 GetForce(float worldx, float worldz, float area)
+        public Vector3 GetForce(float worldx, float worldz, float worldy, float area)
         {
             float airDensity = 1.2256f;
             float pressure = airDensity * speed * speed / 2;
             float forceMagnitude = pressure * area;
 
-            return direction * forceMagnitude * GetGustMultiplier(worldx, worldz);
+            return direction * forceMagnitude * GetGustMultiplier(worldx, worldz, worldy);
         }
     }
 
@@ -253,17 +255,26 @@ public class VeryLett : MonoBehaviour
         // Draw points
 
         Vector3 debugDrawOrigin = Vector3.zero;
-        int numPoints = 50;
+        int numPoints = 20;
+        int ypoints = 15;
         float width = 10.0f;
-        float stepSize = width / 50;
+        float stepSize = width / numPoints;
         for (int x = 0; x < numPoints; x++)
         {
             for (int z = 0; z < numPoints; z++)
             {
-                Vector3 worldCoord = debugDrawOrigin + Vector3.right * x * stepSize + Vector3.forward * z * stepSize;
-                float gustStrength = globalWind.GetGustMultiplier(worldCoord.x, worldCoord.z);
-                Gizmos.color = new Color(gustStrength, gustStrength, gustStrength, 1.0f);
-                Gizmos.DrawSphere(worldCoord, 0.1f);
+                for (int y = 0; y < ypoints; y++)
+                {
+                    Vector3 worldCoord = debugDrawOrigin + new Vector3(x * stepSize, y * (width/ypoints), z * stepSize);    // Vector3.right * x * stepSize + Vector3.forward * z * stepSize + ;
+                    float gustStrength = globalWind.GetGustMultiplier(worldCoord.x, worldCoord.z,worldCoord.y);
+                    if (gustStrength <= 0.2)
+                    {
+                        break;
+                    }
+                    Gizmos.color = new Color(gustStrength, gustStrength, gustStrength, gustStrength);
+                    Gizmos.DrawSphere(worldCoord, 0.1f);
+
+                }
             }
         }
 
@@ -309,7 +320,13 @@ public class VeryLett : MonoBehaviour
 
         globalWind.Update(dt);
 
-		for (int i = 0; i < simSteps; i++)
+        // Apply wind
+        foreach (var point in points)
+        {
+            point.velocity += globalWind.GetForce(point.position.x, point.position.z,point.position.y, pointArea) / pointMass * dt;
+        }
+
+        for (int i = 0; i < simSteps; i++)
 		{
             // Transform attached points
             foreach (var p in attachedPoints)
@@ -323,12 +340,6 @@ public class VeryLett : MonoBehaviour
 				point.accumulatedVelocity = Vector3.zero;
 				point.accumulatedVelocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
 			}
-
-            // Apply wind
-            foreach (var point in points)
-            {
-                point.accumulatedVelocity += globalWind.GetForce(point.position.x, point.position.z, pointArea) / pointMass * dt;
-            }
 
             // Calculate link constraints
             if (solver == SolverEnum.InternalDamperForce)
