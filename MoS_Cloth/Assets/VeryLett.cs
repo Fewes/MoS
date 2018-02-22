@@ -101,6 +101,42 @@ public class VeryLett : MonoBehaviour
 		}
 	}
 
+    [System.Serializable]
+    public class Wind
+    {
+        private Vector3 position = Vector3.zero;
+        public Vector3 direction = Vector3.forward;
+        public float frequency = 0.6f;
+        public float speed = 1.0f;
+
+        public Wind() {}
+
+        public void SetWindProperties(Vector3 dir, float sp)
+        {
+            direction = dir;
+            speed = sp;
+        }
+
+        public void Update(float deltaTime)
+        {
+            position += direction * speed * deltaTime;
+        }
+
+        public float GetGustMultiplier(float worldx, float worldz)
+        {
+            return Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency);
+        }
+
+        public Vector3 GetForce(float worldx, float worldz, float area)
+        {
+            float airDensity = 1.2256f;
+            float pressure = airDensity * speed * speed / 2;
+            float forceMagnitude = pressure * area;
+
+            return direction * forceMagnitude * GetGustMultiplier(worldx, worldz);
+        }
+    }
+
     public void SetPreset(PresetEnum newPreset)
     {
         tempPreset = newPreset;
@@ -169,6 +205,8 @@ public class VeryLett : MonoBehaviour
 
     public Transform    attachmentTransform    = null;
 
+    public Wind         globalWind;
+    
     // Private
     float				remainder;
 
@@ -209,7 +247,25 @@ public class VeryLett : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (points == null || links == null)
+        // WIND
+        // Draw points
+
+        Vector3 debugDrawOrigin = Vector3.zero;
+        int numPoints = 50;
+        float width = 10.0f;
+        float stepSize = width / 50;
+        for (int x = 0; x < numPoints; x++)
+        {
+            for (int z = 0; z < numPoints; z++)
+            {
+                Vector3 worldCoord = debugDrawOrigin + Vector3.right * x * stepSize + Vector3.forward * z * stepSize;
+                float gustStrength = globalWind.GetGustMultiplier(worldCoord.x, worldCoord.z);
+                Gizmos.color = new Color(gustStrength, gustStrength, gustStrength, 1.0f);
+                Gizmos.DrawSphere(worldCoord, 0.1f);
+            }
+        }
+
+        if (points == null || links == null)
 		return;
 
 		// Draw points
@@ -241,12 +297,15 @@ public class VeryLett : MonoBehaviour
 
 		if (points == null) return;
         float clothArea = GetComponent<ClothFactory>().GetArea();
-        float pointMass = massPerSquareMeter * clothArea / points.Count;
+        float pointArea = clothArea / points.Count;
+        float pointMass = massPerSquareMeter * pointArea;
 
 		points[0].position = transform.position;
 		float dt = Time.deltaTime + remainder;
 		int simSteps = (int)Mathf.Floor(dt / simTime);
 		remainder = dt - simSteps * simTime;
+
+        globalWind.Update(dt);
 
 		for (int i = 0; i < simSteps; i++)
 		{
@@ -263,8 +322,14 @@ public class VeryLett : MonoBehaviour
 				point.accumulatedVelocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
 			}
 
-			// Calculate link constraints
-			if (solver == SolverEnum.InternalDamperForce)
+            // Apply wind
+            foreach (var point in points)
+            {
+                point.accumulatedVelocity += globalWind.GetForce(point.position.x, point.position.z, pointArea) / pointMass * dt;
+            }
+
+            // Calculate link constraints
+            if (solver == SolverEnum.InternalDamperForce)
 			{
 				foreach (var link in links)
 				{
