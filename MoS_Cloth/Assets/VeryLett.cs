@@ -255,8 +255,8 @@ public class VeryLett : MonoBehaviour
     {
         SetPreset(preset);
 
-        GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
         attachedPoints = new List<ClothPointAttachment>();
+        GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter, ref attachedPoints);
 
         if (meshFilter)
         {
@@ -268,13 +268,17 @@ public class VeryLett : MonoBehaviour
         if (!attachmentTransform) attachmentTransform = transform;
 
         // Create list of attached points so that we can update them in the main Update loop
-        foreach (var p in points)
-        {
-            if (p.pinned)
-            {
-                attachedPoints.Add(new ClothPointAttachment(p, attachmentTransform));
-            }
-        }
+        // TODO: Should this default behavior be handled here or must each cloth factory process this list?
+        //if (attachedPoints.Count == 0)
+        //{
+        //    foreach (var p in points)
+        //    {
+        //        if (p.pinned)
+        //        {
+        //            attachedPoints.Add(new ClothPointAttachment(p, attachmentTransform));
+        //        }
+        //    }
+        //}
     }
 
     void OnDrawGizmos()
