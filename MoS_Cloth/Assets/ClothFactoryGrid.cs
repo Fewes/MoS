@@ -141,4 +141,9 @@ public class ClothFactoryGrid : ClothFactory
 		mesh.triangles = triangles;
 		meshFilter.sharedMesh = mesh;
     }
+
+    override public float GetArea()
+    {
+        return dimX * dimY;
+    }
 }

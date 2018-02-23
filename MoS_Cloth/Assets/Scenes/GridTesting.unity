@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18204573, g: 0.22434936, b: 0.28772676, a: 1}
+  m_IndirectSpecularColor: {r: 0.1820459, g: 0.2243495, b: 0.2877268, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -191,7 +191,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 506812431}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.05, z: 0}
+  m_LocalPosition: {x: 16.21, y: 0.05, z: 5.12}
   m_LocalScale: {x: 5, y: 0.1, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -358,7 +358,6 @@ GameObject:
   - component: {fileID: 1009808580}
   - component: {fileID: 1009808579}
   - component: {fileID: 1009808578}
-  - component: {fileID: 1009808581}
   m_Layer: 0
   m_Name: VeryLett (1)
   m_TagString: Untagged
@@ -377,10 +376,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52dbd2239f4f13341959b509ec4805f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dimX: 1.5
-  dimY: 2
-  cellsX: 16
-  cellsY: 16
+  dimX: 2
+  dimY: 3
+  cellsX: 10
+  cellsY: 10
   crossLinks: 1
   attachTopCorners: 1
 --- !u!114 &1009808579
@@ -394,15 +393,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 2
-  springCoefficient: 50
-  globalDampening: 1
+  preset: 2
+  massPerSquareMeter: 1
+  springCoefficient: 100
+  globalDampening: 4
   simTime: 0.005
   gravityMultiplier: 1
   solver: 1
-  internalDampening: 0.005
-  crossLinkStrength: 0.5
+  internalDampening: 0.002
+  crossLinkStrength: 0.1
   attachmentTransform: {fileID: 0}
+  globalWind:
+    direction: {x: 0, y: 0, z: 1}
+    frequency: 0.2
+    speed: 2
+    power: 1.87
 --- !u!4 &1009808580
 Transform:
   m_ObjectHideFlags: 0
@@ -410,46 +415,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1009808577}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.69, y: 3.98, z: -1.46}
+  m_LocalPosition: {x: 4.63, y: 3.53, z: 3.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &1009808581
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1009808577}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_Materials:
-  - {fileID: 2100000, guid: 38cce2c78b580494186ac71f6982dd79, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
 --- !u!1 &1474893472
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,7 +466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1
+  preset: 0
+  massPerSquareMeter: 1
   springCoefficient: 20
   globalDampening: 4
   simTime: 0.005
@@ -504,6 +476,11 @@ MonoBehaviour:
   internalDampening: 0.01
   crossLinkStrength: 0.5
   attachmentTransform: {fileID: 0}
+  globalWind:
+    direction: {x: 0, y: 0, z: 1}
+    frequency: 1
+    speed: 1
+    power: 1
 --- !u!4 &1474893475
 Transform:
   m_ObjectHideFlags: 0
@@ -562,7 +539,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 2
+  preset: 0
+  massPerSquareMeter: 1
   springCoefficient: 20
   globalDampening: 4
   simTime: 0.005
@@ -571,6 +549,11 @@ MonoBehaviour:
   internalDampening: 0.01
   crossLinkStrength: 0.5
   attachmentTransform: {fileID: 0}
+  globalWind:
+    direction: {x: 0, y: 0, z: 1}
+    frequency: 1
+    speed: 1
+    power: 1
 --- !u!4 &1525859938
 Transform:
   m_ObjectHideFlags: 0
@@ -658,10 +641,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1763439048}
-  m_LocalRotation: {x: 0.043076433, y: -0, z: -0, w: 0.99907184}
-  m_LocalPosition: {x: 0, y: 1.64, z: -4.33}
+  m_LocalRotation: {x: 0.12979235, y: -0, z: -0, w: 0.9915412}
+  m_LocalPosition: {x: 4.62, y: 4.13, z: -3.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 4.938, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 14.915001, y: 0, z: 0}

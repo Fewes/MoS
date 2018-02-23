@@ -101,11 +101,100 @@ public class VeryLett : MonoBehaviour
 		}
 	}
 
+    [System.Serializable]
+    public class Wind
+    {
+        private Vector3 position = Vector3.zero;
+        public Vector3 direction = Vector3.forward;
+        public float frequency = 0.6f;
+        public float speed = 1.0f;
+        [Range(1, 10)]
+        public float power = 1;
+
+        public Wind() {}
+
+        public void SetWindProperties(Vector3 dir, float sp)
+        {
+            direction = dir;
+            speed = sp;
+        }
+
+        public void Update(float deltaTime)
+        {
+            position += direction * speed * deltaTime;
+        }
+
+        public float GetGustMultiplier(float worldx, float worldz, float worldy)
+        {
+            float GustFloor = Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency);
+            float GustWall = Mathf.PerlinNoise((worldx - position.x) * frequency, (worldy - position.y) * frequency);
+            return Mathf.Pow((GustFloor + GustWall)/2,power);
+        }
+
+        public Vector3 GetForce(float worldx, float worldz, float worldy, float area)
+        {
+            float airDensity = 1.2256f;
+            float pressure = airDensity * speed * speed / 2;
+            float forceMagnitude = pressure * area;
+
+            return direction * forceMagnitude * GetGustMultiplier(worldx, worldz, worldy);
+        }
+    }
+
+    public void SetPreset(PresetEnum newPreset)
+    {
+        tempPreset = newPreset;
+        preset = newPreset;
+
+        switch (preset)
+        {
+            case PresetEnum.Wool:
+                massPerSquareMeter = 0.4f;
+                springCoefficient = 70;
+                globalDampening = 4;
+                internalDampening = 0.002f;
+                crossLinkStrength = 0.04f;
+                solver = SolverEnum.InternalDamperForce;
+                break;
+
+            case PresetEnum.Silk:
+                massPerSquareMeter = 0.25f;
+                springCoefficient = 80;
+                globalDampening = 4;
+                internalDampening = 0.002f;
+                crossLinkStrength = 0.1f;
+                solver = SolverEnum.InternalDamperForce;
+                break;
+
+            case PresetEnum.Leather:
+                massPerSquareMeter = 3.3f;
+                springCoefficient = 220;
+                globalDampening = 1;
+                internalDampening = 0.04f;
+                crossLinkStrength = 1.5f;
+                solver = SolverEnum.InternalDamperForce;
+                break;
+
+            case PresetEnum.Default:
+                
+                break;
+
+        }
+    }
+
 	[System.Serializable]
 	public enum SolverEnum { Default, InternalDamperForce };
 
-	// Public
-	public float		mass					= 1;
+    [System.Serializable]
+    public enum PresetEnum { Default, Wool, Silk , Leather };
+
+
+    // Public
+    [SerializeField]
+    public PresetEnum   preset                  = PresetEnum.Default;
+    PresetEnum          tempPreset              = PresetEnum.Default;
+
+    public float		massPerSquareMeter		= 1;
 	public float		springCoefficient		= 10;
 	public float		globalDampening			= 0;
 	public float		simTime					= 0.005f;
@@ -120,6 +209,8 @@ public class VeryLett : MonoBehaviour
 
     public Transform    attachmentTransform    = null;
 
+    public Wind         globalWind;
+    
     // Private
     float				remainder;
 
@@ -134,7 +225,9 @@ public class VeryLett : MonoBehaviour
 
     void Start ()
 	{
-		GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
+        SetPreset(preset);
+
+        GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
         attachedPoints = new List<ClothPointAttachment>();
 
         if (meshFilter)
@@ -158,7 +251,34 @@ public class VeryLett : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (points == null || links == null)
+        // WIND
+        // Draw points
+
+        Vector3 debugDrawOrigin = Vector3.zero;
+        int numPoints = 20;
+        int ypoints = 15;
+        float width = 10.0f;
+        float stepSize = width / numPoints;
+        for (int x = 0; x < numPoints; x++)
+        {
+            for (int z = 0; z < numPoints; z++)
+            {
+                for (int y = 0; y < ypoints; y++)
+                {
+                    Vector3 worldCoord = debugDrawOrigin + new Vector3(x * stepSize, y * (width/ypoints), z * stepSize);    // Vector3.right * x * stepSize + Vector3.forward * z * stepSize + ;
+                    float gustStrength = globalWind.GetGustMultiplier(worldCoord.x, worldCoord.z,worldCoord.y);
+                    if (gustStrength <= 0.2)
+                    {
+                        break;
+                    }
+                    Gizmos.color = new Color(gustStrength, gustStrength, gustStrength, gustStrength);
+                    Gizmos.DrawSphere(worldCoord, 0.1f);
+
+                }
+            }
+        }
+
+        if (points == null || links == null)
 		return;
 
 		// Draw points
@@ -185,15 +305,28 @@ public class VeryLett : MonoBehaviour
 	
 	void Update ()
 	{
+        if (tempPreset != preset)
+            SetPreset(preset);
+
 		if (points == null) return;
-		float pointMass = mass / points.Count;
+        float clothArea = GetComponent<ClothFactory>().GetArea();
+        float pointArea = clothArea / points.Count;
+        float pointMass = massPerSquareMeter * pointArea;
 
 		points[0].position = transform.position;
 		float dt = Time.deltaTime + remainder;
 		int simSteps = (int)Mathf.Floor(dt / simTime);
 		remainder = dt - simSteps * simTime;
 
-		for (int i = 0; i < simSteps; i++)
+        globalWind.Update(dt);
+
+        // Apply wind
+        foreach (var point in points)
+        {
+            point.velocity += globalWind.GetForce(point.position.x, point.position.z,point.position.y, pointArea) / pointMass * dt;
+        }
+
+        for (int i = 0; i < simSteps; i++)
 		{
             // Transform attached points
             foreach (var p in attachedPoints)
@@ -208,8 +341,8 @@ public class VeryLett : MonoBehaviour
 				point.accumulatedVelocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
 			}
 
-			// Calculate link constraints
-			if (solver == SolverEnum.InternalDamperForce)
+            // Calculate link constraints
+            if (solver == SolverEnum.InternalDamperForce)
 			{
 				foreach (var link in links)
 				{
