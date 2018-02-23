@@ -16,8 +16,6 @@ public class ClothFactoryMesh : ClothFactory
 
     // Skinned mesh variables
     bool isSkinnedMesh = false;
-    GameObject character = null;
-
 
     public class Edge
     {
@@ -163,7 +161,6 @@ public class ClothFactoryMesh : ClothFactory
 
 	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks, ref MeshFilter meshFilter, ref List<VeryLett.ClothPointAttachment> attachedPoints)
 	{
-        VeryLett parentScript = gameObject.GetComponentInParent<VeryLett>();
         SkinnedMeshRenderer skinnedMeshRenderer = GetComponentInParent<SkinnedMeshRenderer>();
 
         if (!mesh)
@@ -174,18 +171,11 @@ public class ClothFactoryMesh : ClothFactory
                 mesh = skinnedMeshRenderer.sharedMesh;
                 meshFilter = GetComponentInParent<MeshFilter>();
 
-                // TODO: Change to list of bones
                 Transform bone = skinnedMeshRenderer.rootBone;
-                foreach (Transform t in bone.GetComponentsInChildren<Transform>())
+                foreach (Transform t in skinnedMeshRenderer.bones)
                 {
-                    if (t.name == attachToBone)
-                    {
-                        bone = t;
-                        break;
-                    }
+                    if (t.name == attachToBone) { bone = t; break; }
                 }
-                // NOTE: VERY NASTY, CIRCULAR DEPENDENCY TO PARENT
-                parentScript.attachmentTransform = (bone) ? bone : null;
             }
             else
             {

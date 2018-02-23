@@ -235,8 +235,6 @@ public class VeryLett : MonoBehaviour
     [Range(0, 2f)]
     public float crossLinkStrength = 0.5f;
 
-    public Transform attachmentTransform = null;
-
     public Wind globalWind;
 
     // Private
@@ -263,22 +261,6 @@ public class VeryLett : MonoBehaviour
             meshFilter.sharedMesh.MarkDynamic();
             vertices = meshFilter.sharedMesh.vertices;
         }
-
-        // Default attachment is the GameObject transform
-        if (!attachmentTransform) attachmentTransform = transform;
-
-        // Create list of attached points so that we can update them in the main Update loop
-        // TODO: Should this default behavior be handled here or must each cloth factory process this list?
-        //if (attachedPoints.Count == 0)
-        //{
-        //    foreach (var p in points)
-        //    {
-        //        if (p.pinned)
-        //        {
-        //            attachedPoints.Add(new ClothPointAttachment(p, attachmentTransform));
-        //        }
-        //    }
-        //}
     }
 
     void OnDrawGizmos()

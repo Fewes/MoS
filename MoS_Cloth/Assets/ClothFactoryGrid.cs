@@ -114,6 +114,18 @@ public class ClothFactoryGrid : ClothFactory
             points[cellsX].pinned = true;
         }
 
+        // Create list of attached points so that we can update them in the main Update loop
+        if (attachedPoints.Count == 0)
+        {
+            foreach (var p in points)
+            {
+                if (p.pinned)
+                {
+                    attachedPoints.Add(new VeryLett.ClothPointAttachment(p, transform));
+                }
+            }
+        }
+
 		// Initialize the mesh object
 		if (!meshFilter)
 			meshFilter = gameObject.AddComponent<MeshFilter>();
