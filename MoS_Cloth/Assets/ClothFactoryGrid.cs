@@ -31,7 +31,8 @@ public class ClothFactoryGrid : ClothFactory
         int numPointsX = cellsX + 1;
         int numPointsY = cellsY + 1;
 
-		Vector3[] vertices = new Vector3[numPointsX * numPointsY];
+		Vector3[] vertices	= new Vector3[numPointsX * numPointsY];
+		Vector2[] uvs		= new Vector2[numPointsX * numPointsY];
 		int i = 0;
 
         // Add points
@@ -44,6 +45,9 @@ public class ClothFactoryGrid : ClothFactory
             {
 				var pos = origin + stepX * x - stepY * y + Random.onUnitSphere * Mathf.Epsilon;
                 points.Add(new VeryLett.ClothPoint(pos, new int[] {i}));
+
+				uvs[i].x = (float)x / (float)numPointsX;
+				uvs[i].y = (float)y / (float)numPointsY;
 				vertices[i++] = transform.InverseTransformPoint(pos);
             }
         }
@@ -135,11 +139,12 @@ public class ClothFactoryGrid : ClothFactory
 			}
 		}
 
-		Mesh mesh = new Mesh();
-		mesh.name = gameObject.name + "_VeryLettMesh";
-		mesh.vertices = vertices;
-		mesh.triangles = triangles;
-		meshFilter.sharedMesh = mesh;
+		Mesh mesh				= new Mesh();
+		mesh.name				= gameObject.name + "_VeryLettMesh";
+		mesh.vertices			= vertices;
+		mesh.uv					= uvs;
+		mesh.triangles			= triangles;
+		meshFilter.sharedMesh	= mesh;
     }
 
     override public float GetArea()
