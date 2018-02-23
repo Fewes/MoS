@@ -51,8 +51,8 @@ LightmapSettings:
     m_AlbedoBoost: 1
     m_TemporalCoherenceThreshold: 1
     m_EnvironmentLightingMode: 0
-    m_EnableBakedLightmaps: 1
-    m_EnableRealtimeLightmaps: 1
+    m_EnableBakedLightmaps: 0
+    m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 9
     m_Resolution: 2
@@ -268,6 +268,67 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &517033612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 517033614}
+  - component: {fileID: 517033613}
+  m_Layer: 0
+  m_Name: Reflection Probe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!215 &517033613
+ReflectionProbe:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 517033612}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Type: 0
+  m_Mode: 0
+  m_RefreshMode: 0
+  m_TimeSlicingMode: 0
+  m_Resolution: 128
+  m_UpdateFrequency: 0
+  m_BoxSize: {x: 10, y: 10, z: 10}
+  m_BoxOffset: {x: 0, y: 0, z: 0}
+  m_NearClip: 0.3
+  m_FarClip: 1000
+  m_ShadowDistance: 100
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IntensityMultiplier: 1
+  m_BlendDistance: 1
+  m_HDR: 1
+  m_BoxProjection: 0
+  m_RenderDynamicObjects: 0
+  m_UseOcclusionCulling: 1
+  m_Importance: 1
+  m_CustomBakedTexture: {fileID: 0}
+--- !u!4 &517033614
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 517033612}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.94, y: 2.5110781, z: -0.089}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &649338657
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,8 +511,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dimX: 0.75
   dimY: 1.25
-  cellsX: 6
-  cellsY: 6
+  cellsX: 16
+  cellsY: 16
   crossLinks: 0
   attachTopCorners: 1
 --- !u!114 &1009808579
@@ -465,21 +526,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2bdd7a67d64974183cee199f7bb76d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  preset: 2
-  massPerSquareMeter: 1
-  springCoefficient: 200
-  globalDampening: 5
+  preset: 0
+  massPerSquareMeter: 0.25
+  springCoefficient: 10
+  globalDampening: 4
   simTime: 0.005
   gravityMultiplier: 1
   solver: 1
-  internalDampening: 0.016
-  crossLinkStrength: 1.72
-  attachmentTransform: {fileID: 1078532275}
+  internalDampening: 0.002
+  crossLinkStrength: 0.1
   globalWind:
     direction: {x: 0, y: 0, z: 1}
     frequency: 0.6
     speed: 1
     power: 1
+    debugPreview: 0
 --- !u!4 &1009808580
 Transform:
   m_ObjectHideFlags: 0
@@ -527,10 +588,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!4 &1078532275 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 400006, guid: d91db09430e1dda4488305016ccc05e9, type: 3}
-  m_PrefabInternal: {fileID: 1479561558}
 --- !u!1 &1474893472
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,12 +642,12 @@ MonoBehaviour:
   solver: 0
   internalDampening: 0.01
   crossLinkStrength: 0.5
-  attachmentTransform: {fileID: 0}
   globalWind:
     direction: {x: 0, y: 0, z: 1}
     frequency: 0.6
     speed: 1
     power: 1
+    debugPreview: 0
 --- !u!4 &1474893475
 Transform:
   m_ObjectHideFlags: 0
@@ -736,12 +793,12 @@ MonoBehaviour:
   solver: 0
   internalDampening: 0.01
   crossLinkStrength: 0.5
-  attachmentTransform: {fileID: 0}
   globalWind:
     direction: {x: 0, y: 0, z: 1}
     frequency: 0.6
     speed: 1
     power: 1
+    debugPreview: 0
 --- !u!4 &1525859938
 Transform:
   m_ObjectHideFlags: 0

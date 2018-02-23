@@ -14,7 +14,7 @@ Shader "VeryLett/Cloth"
 		Cull Back
 
 		CGPROGRAM
-			#pragma surface surf Lambert nolightmap addshadow
+			#pragma surface surf Standard nolightmap addshadow
 
 			struct Input
 			{
@@ -25,7 +25,7 @@ Shader "VeryLett/Cloth"
 			sampler2D _MainTex;
 			sampler2D _NormalMap;
 
-			void surf (Input IN, inout SurfaceOutput o)
+			void surf (Input IN, inout SurfaceOutputStandard o)
 			{
 				half4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
 				o.Albedo = c.rgb;
