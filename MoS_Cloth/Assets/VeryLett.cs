@@ -4,29 +4,29 @@ using UnityEngine;
 
 public class VeryLett : MonoBehaviour
 {
-	public class ClothPoint
-	{
-		public Vector3	position;
-		public Vector3	velocity;
-		public Vector3  accumulatedVelocity;
-        public bool     pinned;
-		public int[]	vIndices;
+    public class ClothPoint
+    {
+        public Vector3 position;
+        public Vector3 velocity;
+        public Vector3 accumulatedVelocity;
+        public bool pinned;
+        public int[] vIndices;
 
-		public ClothPoint (Vector3 pos)
-		{
-			position = pos;
-			velocity = Vector3.zero;
-			pinned = false;
-		}
+        public ClothPoint(Vector3 pos)
+        {
+            position = pos;
+            velocity = Vector3.zero;
+            pinned = false;
+        }
 
-		public ClothPoint (Vector3 pos, int[] indices)
-		{
-			position = pos;
-			velocity = Vector3.zero;
-			pinned = false;
-			vIndices = indices;
-		}
-	}
+        public ClothPoint(Vector3 pos, int[] indices)
+        {
+            position = pos;
+            velocity = Vector3.zero;
+            pinned = false;
+            vIndices = indices;
+        }
+    }
 
     public class ClothPointAttachment
     {
@@ -49,57 +49,57 @@ public class VeryLett : MonoBehaviour
     }
 
     public class ClothLink
-	{
-		public ClothPoint	A;
-		public ClothPoint	B;
-		public float		restDist;
+    {
+        public ClothPoint A;
+        public ClothPoint B;
+        public float restDist;
 
-		public ClothLink (ClothPoint a, ClothPoint b)
-		{
-			A = a;
-			B = b;
-			restDist = Vector3.Distance(A.position, B.position);
-		}
+        public ClothLink(ClothPoint a, ClothPoint b)
+        {
+            A = a;
+            B = b;
+            restDist = Vector3.Distance(A.position, B.position);
+        }
 
-		public void SolveLink(float k, float st, float pointMass)
-		{
-			// Relative vector going from A to B
-			Vector3 dir = B.position - A.position;
+        public void SolveLink(float k, float st, float pointMass)
+        {
+            // Relative vector going from A to B
+            Vector3 dir = B.position - A.position;
 
-			// Current distance between A and B
-			float dist = dir.magnitude;
+            // Current distance between A and B
+            float dist = dir.magnitude;
 
-			// Normalize directional vector
-			dir /= dist;
+            // Normalize directional vector
+            dir /= dist;
 
-			// Calculate spring force
-			Vector3 force = k * dir * (dist - restDist);
+            // Calculate spring force
+            Vector3 force = k * dir * (dist - restDist);
 
-			// Apply force to both points
-			A.accumulatedVelocity += force / pointMass * st;
-			B.accumulatedVelocity -= force / pointMass * st;
-		}
+            // Apply force to both points
+            A.accumulatedVelocity += force / pointMass * st;
+            B.accumulatedVelocity -= force / pointMass * st;
+        }
 
-		public void SolveLinkWithDamper(float k, float st, float pointMass, float dampeningCoefficient)
-		{
-			// Relative vector going from A to B
-			Vector3 r = B.position - A.position;
+        public void SolveLinkWithDamper(float k, float st, float pointMass, float dampeningCoefficient)
+        {
+            // Relative vector going from A to B
+            Vector3 r = B.position - A.position;
 
-			// Calculate spring force
-			Vector3 force = k * (r.magnitude - restDist) * r.normalized;
+            // Calculate spring force
+            Vector3 force = k * (r.magnitude - restDist) * r.normalized;
 
-			// Calculate dampening
-			Vector3 vA = A.velocity + B.velocity;
-			Vector3 vB = B.velocity + A.velocity;
-			Vector3 Fa = dampeningCoefficient * Vector3.Project(vA, r.normalized);
-			Vector3 Fb = dampeningCoefficient * Vector3.Project(vB, r.normalized);
+            // Calculate dampening
+            Vector3 vA = A.velocity + B.velocity;
+            Vector3 vB = B.velocity + A.velocity;
+            Vector3 Fa = dampeningCoefficient * Vector3.Project(vA, r.normalized);
+            Vector3 Fb = dampeningCoefficient * Vector3.Project(vB, r.normalized);
 
-			// Store accumulated velocities for later
-			Vector3 springDisplacement = force / pointMass * st;
-			A.accumulatedVelocity +=  springDisplacement - Fa / pointMass * st;
-			B.accumulatedVelocity += -springDisplacement - Fb / pointMass * st;
-		}
-	}
+            // Store accumulated velocities for later
+            Vector3 springDisplacement = force / pointMass * st;
+            A.accumulatedVelocity += springDisplacement - Fa / pointMass * st;
+            B.accumulatedVelocity += -springDisplacement - Fb / pointMass * st;
+        }
+    }
 
     [System.Serializable]
     public class Wind
@@ -112,7 +112,7 @@ public class VeryLett : MonoBehaviour
         public float power = 1;
         public bool debugPreview = false;
 
-        public Wind() {}
+        public Wind() { }
 
         public void SetWindProperties(Vector3 dir, float sp)
         {
@@ -129,7 +129,7 @@ public class VeryLett : MonoBehaviour
         {
             float GustFloor = Mathf.PerlinNoise((worldx - position.x) * frequency, (worldz - position.z) * frequency);
             float GustWall = Mathf.PerlinNoise((worldx - position.x) * frequency, (worldy - position.y) * frequency);
-            return Mathf.Pow((GustFloor + GustWall)/2,power);
+            return Mathf.Pow((GustFloor + GustWall) / 2, power);
         }
 
         public Vector3 GetForce(float worldx, float worldz, float worldy, float area)
@@ -204,65 +204,65 @@ public class VeryLett : MonoBehaviour
                 break;
 
             case PresetEnum.Default:
-                
+
                 break;
 
         }
     }
 
-	[System.Serializable]
-	public enum SolverEnum { Default, InternalDamperForce };
+    [System.Serializable]
+    public enum SolverEnum { Default, InternalDamperForce };
 
     [System.Serializable]
-    public enum PresetEnum { Default, Wool, Silk , Leather };
+    public enum PresetEnum { Default, Wool, Silk, Leather };
 
 
     // Public
     [SerializeField]
-    public PresetEnum   preset                  = PresetEnum.Default;
-    PresetEnum          tempPreset              = PresetEnum.Default;
+    public PresetEnum preset = PresetEnum.Default;
+    PresetEnum tempPreset = PresetEnum.Default;
 
-    public float		massPerSquareMeter		= 1;
-	public float		springCoefficient		= 10;
-	public float		globalDampening			= 0;
-	public float		simTime					= 0.005f;
-	[Range(0, 1)]
-	public float		gravityMultiplier		= 0.25f;
-	public SolverEnum   solver				    = SolverEnum.Default;
+    public float massPerSquareMeter = 1;
+    public float springCoefficient = 10;
+    public float globalDampening = 0;
+    public float simTime = 0.005f;
+    [Range(0, 1)]
+    public float gravityMultiplier = 0.25f;
+    public SolverEnum solver = SolverEnum.Default;
 
-	[Range(0, 0.2f)]
-	public float		internalDampening	   = 0.01f;
+    [Range(0, 0.2f)]
+    public float internalDampening = 0.01f;
     [Range(0, 2f)]
-    public float        crossLinkStrength      = 0.5f;
+    public float crossLinkStrength = 0.5f;
 
-    public Transform    attachmentTransform    = null;
+    public Transform attachmentTransform = null;
 
-    public Wind         globalWind;
-    
+    public Wind globalWind;
+
     // Private
-    float				remainder;
+    float remainder;
 
-	List<ClothPoint>	points;
-	List<ClothLink>		links;
-    List<ClothLink>     xLinks;
+    List<ClothPoint> points;
+    List<ClothLink> links;
+    List<ClothLink> xLinks;
 
-	MeshFilter			meshFilter;
-	Vector3[]			vertices;
+    MeshFilter meshFilter;
+    Vector3[] vertices;
 
     List<ClothPointAttachment> attachedPoints;
 
-    void Start ()
-	{
+    void Start()
+    {
         SetPreset(preset);
 
         GetComponent<ClothFactory>().InitializeCloth(transform, ref points, ref links, ref xLinks, ref meshFilter);
         attachedPoints = new List<ClothPointAttachment>();
 
         if (meshFilter)
-		{
-			meshFilter.sharedMesh.MarkDynamic();
-			vertices = meshFilter.sharedMesh.vertices;
-		}
+        {
+            meshFilter.sharedMesh.MarkDynamic();
+            vertices = meshFilter.sharedMesh.vertices;
+        }
 
         // Default attachment is the GameObject transform
         if (!attachmentTransform) attachmentTransform = transform;
@@ -277,31 +277,29 @@ public class VeryLett : MonoBehaviour
         }
     }
 
-	void OnDrawGizmos ()
-	{
-        // WIND
-        // Draw points
+    void OnDrawGizmos()
+    {
         if (globalWind.debugPreview)
         {
             globalWind.DrawDebugVolume();
         }
 
         if (points == null || links == null)
-		return;
+            return;
 
-		// Draw points
-		foreach (var point in points)
-		{
-			Gizmos.color = Color.yellow * 10;
-			Gizmos.DrawSphere(point.position, 0.025f);
-		}
+        // Draw points
+        foreach (var point in points)
+        {
+            Gizmos.color = Color.yellow * 10;
+            Gizmos.DrawSphere(point.position, 0.025f);
+        }
 
-		// Draw horizontal and vertical links
-		foreach (var link in links)
-		{
-			Gizmos.color = Color.green * 10;
-			Gizmos.DrawLine(link.A.position, link.B.position);
-		}
+        // Draw horizontal and vertical links
+        foreach (var link in links)
+        {
+            Gizmos.color = Color.green * 10;
+            Gizmos.DrawLine(link.A.position, link.B.position);
+        }
 
         // Draw crosslinks
         foreach (var xLink in xLinks)
@@ -310,12 +308,14 @@ public class VeryLett : MonoBehaviour
             Gizmos.DrawLine(xLink.A.position, xLink.B.position);
         }
     }
-	
-	void Update ()
-	{
-        if (tempPreset != preset)
-            SetPreset(preset);
 
+    private void OnValidate()
+    {
+        if (tempPreset != preset) SetPreset(preset);
+    }
+
+    void Update()
+    { 
 		if (points == null) return;
         float clothArea = GetComponent<ClothFactory>().GetArea();
         float pointArea = clothArea / points.Count;
