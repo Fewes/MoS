@@ -313,7 +313,6 @@ public class VeryLett : MonoBehaviour
         float pointArea = clothArea / points.Count;
         float pointMass = massPerSquareMeter * pointArea;
 
-		points[0].position = transform.position;
 		float dt = Time.deltaTime + remainder;
 		int simSteps = (int)Mathf.Floor(dt / simTime);
 		remainder = dt - simSteps * simTime;
