@@ -110,6 +110,7 @@ public class VeryLett : MonoBehaviour
         public float speed = 1.0f;
         [Range(1, 10)]
         public float power = 1;
+        public bool debugPreview = false;
 
         public Wind() {}
 
@@ -138,6 +139,33 @@ public class VeryLett : MonoBehaviour
             float forceMagnitude = pressure * area;
 
             return direction * forceMagnitude * GetGustMultiplier(worldx, worldz, worldy);
+        }
+
+        public void DrawDebugVolume()
+        {
+            Vector3 debugDrawOrigin = Vector3.zero;
+            int numPoints = 20;
+            int ypoints = 15;
+            float width = 10.0f;
+            float stepSize = width / numPoints;
+            for (int x = 0; x < numPoints; x++)
+            {
+                for (int z = 0; z < numPoints; z++)
+                {
+                    for (int y = 0; y < ypoints; y++)
+                    {
+                        Vector3 worldCoord = debugDrawOrigin + new Vector3(x * stepSize, y * (width / ypoints), z * stepSize);    // Vector3.right * x * stepSize + Vector3.forward * z * stepSize + ;
+                        float gustStrength = GetGustMultiplier(worldCoord.x, worldCoord.z, worldCoord.y);
+                        if (gustStrength <= 0.2)
+                        {
+                            break;
+                        }
+                        Gizmos.color = new Color(gustStrength, gustStrength, gustStrength, gustStrength);
+                        Gizmos.DrawSphere(worldCoord, 0.1f);
+
+                    }
+                }
+            }
         }
     }
 
@@ -253,29 +281,9 @@ public class VeryLett : MonoBehaviour
 	{
         // WIND
         // Draw points
-
-        Vector3 debugDrawOrigin = Vector3.zero;
-        int numPoints = 20;
-        int ypoints = 15;
-        float width = 10.0f;
-        float stepSize = width / numPoints;
-        for (int x = 0; x < numPoints; x++)
+        if (globalWind.debugPreview)
         {
-            for (int z = 0; z < numPoints; z++)
-            {
-                for (int y = 0; y < ypoints; y++)
-                {
-                    Vector3 worldCoord = debugDrawOrigin + new Vector3(x * stepSize, y * (width/ypoints), z * stepSize);    // Vector3.right * x * stepSize + Vector3.forward * z * stepSize + ;
-                    float gustStrength = globalWind.GetGustMultiplier(worldCoord.x, worldCoord.z,worldCoord.y);
-                    if (gustStrength <= 0.2)
-                    {
-                        break;
-                    }
-                    Gizmos.color = new Color(gustStrength, gustStrength, gustStrength, gustStrength);
-                    Gizmos.DrawSphere(worldCoord, 0.1f);
-
-                }
-            }
+            globalWind.DrawDebugVolume();
         }
 
         if (points == null || links == null)
