@@ -249,6 +249,14 @@ public class VeryLett : MonoBehaviour
 
     List<ClothPointAttachment> attachedPoints;
 
+    [System.Serializable]
+    public class ExternalCollision
+    {
+        public SphereCollider[] sphereColliders; // TODO: Remove public property and generate this array properly
+        public bool enableCollisionWithColliders = true;
+    }
+    public ExternalCollision externalCollision = new ExternalCollision();
+
     void Start()
     {
         SetPreset(preset);
@@ -369,10 +377,45 @@ public class VeryLett : MonoBehaviour
 			foreach (var point in points)
 				point.velocity *= Mathf.Max(1 - simTime * globalDampening, 0);
 
-			// Apply forces
-			foreach (var point in points)
-			if (!point.pinned)
-				point.position += point.velocity * simTime; // m/s * s = m
+            // Apply forces
+            if (externalCollision.enableCollisionWithColliders)
+            {
+                Vector3 newPosition;
+                Vector3 collisionNormal;
+                foreach (var point in points)
+                {
+			        if (!point.pinned)
+                    {
+                        // Solve collision against colliders
+                        newPosition = point.position + point.velocity * simTime;
+                        foreach (var sphere in externalCollision.sphereColliders)
+                        {
+                            float scaledSphereRadius = sphere.radius * sphere.transform.lossyScale.x;
+
+                            // Keep pushing newPosition around until we have tested all colliders. 
+                            // (not correct, but we need to "move on" during stuck scenarios)
+                            collisionNormal = newPosition - sphere.transform.position;
+                            if (collisionNormal.magnitude <= scaledSphereRadius)
+                            {
+                                newPosition = sphere.transform.position + collisionNormal.normalized * scaledSphereRadius;
+                                point.velocity -= Vector3.Project(point.velocity, collisionNormal.normalized);
+                            }
+                        }
+
+                        point.position = newPosition;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var point in points)
+                {
+                    if (!point.pinned)
+                    {
+                        point.position += point.velocity * simTime; // m/s * s = m
+                    }
+                }
+            }
 		}
 
 		UpdateMesh();

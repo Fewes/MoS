@@ -176,6 +176,18 @@ public class ClothFactoryMesh : ClothFactory
                 {
                     if (t.name == attachToBone) { bone = t; break; }
                 }
+
+                VeryLett parentScript = GetComponentInParent<VeryLett>();
+
+                if (parentScript)
+                {
+                    parentScript.externalCollision.sphereColliders = skinnedMeshRenderer.rootBone.GetComponentsInChildren<SphereCollider>();
+
+                    //foreach (var c in parentScript.colliders)
+                    //{
+                    //    Debug.Log(skinnedMeshRenderer.rootBone.name + ": " + c.name);
+                    //}
+                }
             }
             else
             {
