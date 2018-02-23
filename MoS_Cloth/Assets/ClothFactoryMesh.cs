@@ -10,8 +10,14 @@ public class ClothFactoryMesh : ClothFactory
 {
 	[SerializeField]
 	Mesh		mesh;
-    public bool PinFirstAndLastPoint = true;
-    public bool MergeUVBorders = true;
+    public bool pinFirstAndLastPoint = false;
+    public bool mergeUVBorders = false;
+    public string attachToBone = "";
+
+    // Skinned mesh variables
+    bool isSkinnedMesh = false;
+    GameObject character = null;
+
 
     public class Edge
     {
@@ -155,10 +161,42 @@ public class ClothFactoryMesh : ClothFactory
         colors = newColors.ToArray();
     }
 
-	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks, ref MeshFilter meshFilter)
+	override public void InitializeCloth(Transform transform, ref List<VeryLett.ClothPoint> points, ref List<VeryLett.ClothLink> links, ref List<VeryLett.ClothLink> xLinks, ref MeshFilter meshFilter, ref List<VeryLett.ClothPointAttachment> attachedPoints)
 	{
-		points = new List<VeryLett.ClothPoint>();
+        VeryLett parentScript = gameObject.GetComponentInParent<VeryLett>();
+        SkinnedMeshRenderer skinnedMeshRenderer = GetComponentInParent<SkinnedMeshRenderer>();
+
+        if (!mesh)
+        {
+            if (skinnedMeshRenderer)
+            {
+                isSkinnedMesh = true;
+                mesh = skinnedMeshRenderer.sharedMesh;
+                meshFilter = GetComponentInParent<MeshFilter>();
+
+                // TODO: Change to list of bones
+                Transform bone = skinnedMeshRenderer.rootBone;
+                foreach (Transform t in bone.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == attachToBone)
+                    {
+                        bone = t;
+                        break;
+                    }
+                }
+                // NOTE: VERY NASTY, CIRCULAR DEPENDENCY TO PARENT
+                parentScript.attachmentTransform = (bone) ? bone : null;
+            }
+            else
+            {
+                meshFilter = GetComponentInParent<MeshFilter>();
+                mesh = (meshFilter) ? meshFilter.mesh : null;
+            }
+        }
+
+        points = new List<VeryLett.ClothPoint>();
 		links  = new List<VeryLett.ClothLink>();
+        xLinks = new List<VeryLett.ClothLink>();
 
         if (mesh && mesh.vertexCount > 0)
         {
@@ -166,7 +204,7 @@ public class ClothFactoryMesh : ClothFactory
             int[] triangles = mesh.triangles;
             Color32[] colors = mesh.colors32;
 
-            if (MergeUVBorders)
+            if (mergeUVBorders)
             {
                 MergeOverlappingVertices(ref vertices, ref triangles, ref colors);
             }
@@ -174,7 +212,7 @@ public class ClothFactoryMesh : ClothFactory
             int i;
             for (i=0; i < vertices.Length; i++)
             {
-                points.Add(new VeryLett.ClothPoint(transform.position + vertices[i]));
+                points.Add(new VeryLett.ClothPoint(transform.TransformPoint(vertices[i])));
             }
 
             for (i=0; i<colors.Length; i++)
@@ -182,7 +220,49 @@ public class ClothFactoryMesh : ClothFactory
                 points[i].pinned = (colors[i].r == 255);
             }
 
-            if (PinFirstAndLastPoint)
+            if (isSkinnedMesh)
+            {
+                // Find the most dominant weight for each vertex and use the bone as attachment transform
+
+                BoneWeight[] weights = mesh.boneWeights;
+
+                float maxWeight;
+                int strongestBoneIndex;
+                for (i=0; i < weights.Length; i++)
+                {
+                    if (points[i].pinned)
+                    {
+                        maxWeight = 0.0f;
+                        strongestBoneIndex = 0;
+
+                        // The weights are class members, not part of an array. Ugly if statements....
+                        if (weights[i].weight0 >= maxWeight)
+                        {
+                            maxWeight = weights[i].weight0;
+                            strongestBoneIndex = weights[i].boneIndex0;
+                        }
+                        if (weights[i].weight1 >= maxWeight)
+                        {
+                            maxWeight = weights[i].weight1;
+                            strongestBoneIndex = weights[i].boneIndex1;
+                        }
+                        if (weights[i].weight2 >= maxWeight)
+                        {
+                            maxWeight = weights[i].weight2;
+                            strongestBoneIndex = weights[i].boneIndex2;
+                        }
+                        if (weights[i].weight3 >= maxWeight)
+                        {
+                            maxWeight = weights[i].weight3;
+                            strongestBoneIndex = weights[i].boneIndex3;
+                        }
+
+                        attachedPoints.Add(new VeryLett.ClothPointAttachment(points[i], skinnedMeshRenderer.bones[strongestBoneIndex]));
+                    }
+                }
+            }
+
+            if (pinFirstAndLastPoint)
             {
                 points[0].pinned = true;
                 points[points.Count-1].pinned = true;
