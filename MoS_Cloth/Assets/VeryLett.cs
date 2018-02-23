@@ -334,6 +334,15 @@ public class VeryLett : MonoBehaviour
 				point.accumulatedVelocity += Physics.gravity * gravityMultiplier * simTime; // m/s^2 * s = m/s
 			}
 
+            // Ground collider check
+            foreach (var point in points)
+            {
+                if(point.position.y <= 0)
+                {
+                    point.position.y = 0.0f;
+                }
+            }
+
             // Calculate link constraints
             if (solver == SolverEnum.InternalDamperForce)
 			{
