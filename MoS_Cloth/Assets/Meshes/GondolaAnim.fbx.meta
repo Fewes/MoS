@@ -1,12 +1,12 @@
 fileFormatVersion: 2
-guid: bae0877766c8d1e48b6d0555b50b6a18
-timeCreated: 1519328223
+guid: 6abb2aadd40de8844abc05df893b6c08
+timeCreated: 1519903907
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
-    100000: //RootNode
-    100002: GondolaCape
+    100000: controllerobjects
+    100002: //RootNode
     100004: Head
     100006: Hip
     100008: Jaw
@@ -17,13 +17,15 @@ ModelImporter:
     100018: L_Toes
     100020: Neck
     100022: Pelvis
-    100024: R_Eye
-    100026: R_Foot
-    100028: R_Shin
-    100030: R_Thigh
-    100032: R_Toes
-    400000: //RootNode
-    400002: GondolaCape
+    100024: Pelvis_ctrl
+    100026: Pelvis_ctrl_null
+    100028: R_Eye
+    100030: R_Foot
+    100032: R_Shin
+    100034: R_Thigh
+    100036: R_Toes
+    400000: controllerobjects
+    400002: //RootNode
     400004: Head
     400006: Hip
     400008: Jaw
@@ -34,23 +36,16 @@ ModelImporter:
     400018: L_Toes
     400020: Neck
     400022: Pelvis
-    400024: R_Eye
-    400026: R_Foot
-    400028: R_Shin
-    400030: R_Thigh
-    400032: R_Toes
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: GondolaCape
+    400024: Pelvis_ctrl
+    400026: Pelvis_ctrl_null
+    400028: R_Eye
+    400030: R_Foot
+    400032: R_Shin
+    400034: R_Thigh
+    400036: R_Toes
     7400000: Take 001
     9500000: //RootNode
-    13700000: GondolaCape
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Gondola_Cape_Material
-    second: {fileID: 2100000, guid: f7d7cc3da3b7b314c9375b1dd0771a2c, type: 2}
+  externalObjects: {}
   materials:
     importMaterials: 1
     materialName: 0
@@ -76,7 +71,35 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []

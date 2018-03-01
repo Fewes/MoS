@@ -25,6 +25,7 @@ ModelImporter:
     100034: R_Thigh
     100036: R_Toes
     100038: GondolaCape
+    100040: Pole
     400000: CapeAttachment
     400002: Face
     400004: //RootNode
@@ -45,6 +46,7 @@ ModelImporter:
     400034: R_Thigh
     400036: R_Toes
     400038: GondolaCape
+    400040: Pole
     2300000: CapeAttachment
     2300002: Face
     2300004: //RootNode
@@ -55,12 +57,14 @@ ModelImporter:
     4300002: Face
     4300004: CapeAttachment
     4300006: GondolaCape
+    4300008: Pole
     7400000: Take 001
     9500000: //RootNode
     13700000: CapeAttachment
     13700002: Face
     13700004: GondolaBody
     13700006: GondolaCape
+    13700008: Pole
   externalObjects:
   - first:
       type: UnityEngine:Material
