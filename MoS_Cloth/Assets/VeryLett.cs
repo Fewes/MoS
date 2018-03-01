@@ -348,6 +348,7 @@ public class VeryLett : MonoBehaviour
                 if(point.position.y <= 0)
                 {
                     point.position.y = 0.0f;
+                    point.velocity.y = 0.0f;
                 }
             }
 
