@@ -13,6 +13,9 @@ public class ClothFactoryGrid : ClothFactory
 
 	void OnDrawGizmos ()
 	{
+		if (Application.isPlaying)
+			return;
+
 		var p0 = transform.position - transform.right * dimX * 0.5f;
 		var p1 = transform.position + transform.right * dimX * 0.5f;
 		var p2 = p0 - transform.up * dimY;
@@ -114,8 +117,10 @@ public class ClothFactoryGrid : ClothFactory
 
         if (attachTopCorners)
         {
-            points[0].pinned = true;
-            points[cellsX].pinned = true;
+			for (int u = 0; u < numPointsX; u++)
+				points[u].pinned = true;
+            //points[0].pinned = true;
+            //points[cellsX].pinned = true;
         }
 
         // Create list of attached points so that we can update them in the main Update loop

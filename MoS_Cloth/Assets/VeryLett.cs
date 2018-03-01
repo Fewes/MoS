@@ -228,6 +228,7 @@ public class VeryLett : MonoBehaviour
     public float simTime = 0.005f;
     [Range(0, 1)]
     public float gravityMultiplier = 0.25f;
+	public float friction = 1f;
     public SolverEnum solver = SolverEnum.Default;
 
     [Range(0, 0.2f)]
@@ -236,6 +237,8 @@ public class VeryLett : MonoBehaviour
     public float crossLinkStrength = 0.5f;
 
     public Wind globalWind;
+
+	public bool drawGizmos = false;
 
     // Private
     float remainder;
@@ -273,6 +276,9 @@ public class VeryLett : MonoBehaviour
 
     void OnDrawGizmos()
     {
+		if (!drawGizmos)
+			return;
+
         if (globalWind.debugPreview)
         {
             globalWind.DrawDebugVolume();
@@ -349,6 +355,7 @@ public class VeryLett : MonoBehaviour
                 {
                     point.position.y = 0.0f;
                     point.velocity.y = 0.0f;
+					point.velocity *= Mathf.Clamp01(1 - Time.deltaTime * friction);
                 }
             }
 
@@ -409,6 +416,8 @@ public class VeryLett : MonoBehaviour
                             {
                                 newPosition = sphere.transform.position + collisionNormal.normalized * scaledSphereRadius;
                                 point.velocity -= Vector3.Project(point.velocity, collisionNormal.normalized);
+
+								point.velocity *= Mathf.Clamp01(1 - Time.deltaTime * friction);
                             }
                         }
 
