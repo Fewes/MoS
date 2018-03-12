@@ -315,8 +315,10 @@ public class VeryLett : MonoBehaviour
     }
 
     void Update()
-    { 
-		if (points == null) return;
+    {
+        if (Input.GetKey("escape")) Application.Quit();
+
+        if (points == null) return;
         float clothArea = GetComponent<ClothFactory>().GetArea();
         float pointArea = clothArea / points.Count;
         float pointMass = massPerSquareMeter * pointArea;

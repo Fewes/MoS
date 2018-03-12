@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1820459, g: 0.2243495, b: 0.2877268, a: 1}
+  m_IndirectSpecularColor: {r: 0.18204573, g: 0.22434936, b: 0.28772676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -182,6 +182,7 @@ MonoBehaviour:
   cellsY: 16
   crossLinks: 0
   attachTopCorners: 1
+  attachTopRow: 1
 --- !u!114 &16324777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -559,7 +560,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 224097048}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.04, y: -0.04, z: 0}
+  m_LocalPosition: {x: -4.04, y: -0.05, z: 0}
   m_LocalScale: {x: 5, y: 0.1, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -812,7 +813,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.52
+  m_Radius: 0.55
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &441765057
 MeshRenderer:
@@ -975,7 +976,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 506812431}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.9823123, y: -0.040000003, z: 0.0028517842}
+  m_LocalPosition: {x: 0.9823123, y: -0.05, z: 0.0028517842}
   m_LocalScale: {x: 5, y: 0.1, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1215,7 +1216,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 680935537}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.05, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1439,6 +1440,7 @@ MonoBehaviour:
   cellsY: 16
   crossLinks: 0
   attachTopCorners: 1
+  attachTopRow: 0
 --- !u!114 &1009808579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1692,6 +1694,7 @@ MonoBehaviour:
   cellsY: 7
   crossLinks: 1
   attachTopCorners: 1
+  attachTopRow: 1
 --- !u!114 &1360896701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1770,6 +1773,7 @@ MonoBehaviour:
   cellsY: 15
   crossLinks: 1
   attachTopCorners: 1
+  attachTopRow: 0
 --- !u!114 &1474893474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2037,6 +2041,7 @@ MonoBehaviour:
   cellsY: 10
   crossLinks: 1
   attachTopCorners: 1
+  attachTopRow: 0
 --- !u!114 &1525859937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2163,7 +2168,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1552613180}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: -0.040000003, z: 0}
+  m_LocalPosition: {x: 6, y: -0.05, z: 0}
   m_LocalScale: {x: 5, y: 0.1, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2238,6 +2243,7 @@ MonoBehaviour:
   cellsY: 16
   crossLinks: 0
   attachTopCorners: 0
+  attachTopRow: 0
 --- !u!114 &1563084296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2279,7 +2285,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1563084293}
   m_LocalRotation: {x: 0.70710576, y: -0.0000010325963, z: 0.0000010325994, w: 0.70710784}
-  m_LocalPosition: {x: 0.99, y: 29.91, z: 1.02}
+  m_LocalPosition: {x: 0.99, y: 20.96, z: 1.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

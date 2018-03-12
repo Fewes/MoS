@@ -10,8 +10,9 @@ public class ClothFactoryGrid : ClothFactory
 	public int		cellsY;
     public bool     crossLinks = false;
     public bool     attachTopCorners = false;
+    public bool     attachTopRow = false;
 
-	void OnDrawGizmos ()
+    void OnDrawGizmos ()
 	{
 		if (Application.isPlaying)
 			return;
@@ -117,10 +118,14 @@ public class ClothFactoryGrid : ClothFactory
 
         if (attachTopCorners)
         {
-			for (int u = 0; u < numPointsX; u++)
-				points[u].pinned = true;
-            //points[0].pinned = true;
-            //points[cellsX].pinned = true;
+            points[0].pinned = true;
+            points[cellsX].pinned = true;
+        }
+
+        if (attachTopRow)
+        {
+            for (int u = 0; u < numPointsX; u++)
+                points[u].pinned = true;
         }
 
         // Create list of attached points so that we can update them in the main Update loop
