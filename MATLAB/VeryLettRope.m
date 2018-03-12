@@ -99,7 +99,7 @@ for i = 1:timeSteps
 	plot ( [p2(1) p3(1)], [p2(2) p3(2)] );
 	plot ( [p3(1) p4(1)], [p3(2) p4(2)] );
 	
-	axis([-1 4 -10 1]);
+	axis([-5 5 -5 2]);
 	
 	pause(timeStep)
 end
